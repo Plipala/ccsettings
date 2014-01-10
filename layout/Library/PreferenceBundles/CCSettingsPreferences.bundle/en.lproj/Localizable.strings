@@ -1,0 +1,27 @@
+"data"="Cellular Data";
+"wifi"="Wi-Fi";
+"airplaneMode"="Airplane Mode";
+"location"="Location Services";
+"doNotDisturb"="Do Not Disturb";
+"lock"="Lock";
+"bluetooth"="Bluetooth";
+"hotspot"="Personal Hotspot";
+"orientationLock"="Orientation Lock";
+"mute"="Mute";
+"shutdown"="Shutdown";
+"reboot"="Reboot";
+"respring"="Respring";
+"VPN"="VPN";
+"home"="Home";
+"vibrate"="Vibrate";
+"screenShot"="Screen Shot";
+"autoLock"="Auto-Lock";
+"killbackground"="Kill Background";
+"clearBadge"="Clear Badge";
+
+"Enabled"="INCLUDE";
+"Disabled"="DO NOT INCLUDE";
+
+"RESPRING_MESSAGE"="Respring to apply settings";
+"RESPRING_CANCEL"="Later";
+"RESPRING_SURE"="Now";

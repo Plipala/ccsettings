@@ -1,0 +1,49 @@
+"CELLULAR_DATA_ON"="蜂窝移动数据: 开启";
+"CELLULAR_DATA_OFF"="蜂窝移动数据: 关闭";
+"GPS_ON"="定位服务: 开启";
+"GPS_OFF"="定位服务: 关闭";
+"PERSONAL_HOTSPOT_ON"="个人热点: 开启";
+"PERSONAL_HOTSPOT_OFF"="个人热点: 关闭";
+"3G_ON"="3G: 开启";
+"3G_OFF"="3G: 关闭";
+"4G_ON"="4G: 开启";
+"4G_OFF"="4G: 关闭";
+"LTE_ON"="LTE: 开启";
+"LTE_OFF"="LTE: 关闭";
+"VPN_ON"="VPN: 开启";
+"VPN_OFF"="VPN: 关闭";
+"SILENT_VIBRATE_ON"="静音模式震动: 开启";
+"SILENT_VIBRATE_OFF"="静音模式震动: 关闭";
+"RING_VIBRATE_ON"="响铃模式震动: 开启";
+"RING_VIBRATE_OFF"="响铃模式震动: 关闭";
+"AUTO_LOCK_NEVER"="自动锁定: 永不";
+"AUTO_LOCK_MIN"="自动锁定: %d分钟";
+"AUTO_LOCK_MINS"="自动锁定: %d分钟";
+"KILL_BG_DEVICE_LOCK"="后台清理: 设备锁定";
+"KILL_BG_APP"="后台清理: %d个应用";
+"KILL_BG_APPS"="后台清理: %d个应用";
+"CLEAR_BADGE_BADGE"="角标清理: %d个角标";
+"CLEAR_BADGE_BADGES"="角标清理: %d个角标";
+"FLUX_ON"="f.lux: 开启";
+"FLUX_OFF"="f.lux: 关闭";
+
+"PERSONAL_HOTSPOT_DATA_OFF_TITLE"="移动蜂窝数据已关闭";
+"PERSONAL_HOTSPOT_DATA_OFF_MESSAGE"="个人热点只有在开启移动蜂窝数据的时候使用，请先打开蜂窝数据。";
+"PERSONAL_HOTSPOT_DATA_OFF_CANCEL"="好的";
+
+"SHOTDOWN_MESSAGE"="设备将被关闭";
+"SHOTDOWN_CANCEL"="取消";
+"SHOTDOWN_SURE"="确认";
+
+"REBOOT_MESSAGE"="设备将被重启";
+"REBOOT_CANCEL"="取消";
+"REBOOT_SURE"="确认";
+
+"RESPRING_MESSAGE"="设备将被注销";
+"RESPRING_CANCEL"="取消";
+"RESPRING_SURE"="确认";
+
+"VPN_TITLE"="VPN";
+"VPN_NO_CONNECTION_MESSAGE"="请设置一个VPN";
+"VPN_NO_PASSWORD_MESSAGE"="请为VPN设置密码";
+"VPN_CANCEL"="确认";

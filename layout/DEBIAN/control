@@ -1,0 +1,9 @@
+Package: com.plipala.ccsettings
+Name: CCSettings
+Depends: mobilesubstrate, preferenceloader
+Version: 0.0.3
+Architecture: iphoneos-arm
+Description: More toggle for ControlCenter
+Maintainer: plipala <plipala@foxmail.com>
+Author: plipala <plipala@foxmail.com>
+Section: Tweaks

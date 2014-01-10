@@ -1,0 +1,10 @@
+{
+	entry = {
+		bundle = "CCSettingsPreferences";
+		cell = PSLinkCell;
+		detail = "CCSettingsPreferencesListController";
+		icon = "CCSettingsPreferences.png";
+		isController = 1;
+		label = CCSettings;
+	};
+}

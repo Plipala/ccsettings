@@ -1,0 +1,49 @@
+"CELLULAR_DATA_ON"="Cellular Data: On";
+"CELLULAR_DATA_OFF"="Cellular Data: Off";
+"GPS_ON"="Location Services: On";
+"GPS_OFF"="Location Services: Off";
+"PERSONAL_HOTSPOT_ON"="Personal Hotspot: On";
+"PERSONAL_HOTSPOT_OFF"="Personal Hotspot: Off";
+"3G_ON"="3G: On";
+"3G_OFF"="3G: Off";
+"4G_ON"="4G: On";
+"4G_OFF"="4G: Off";
+"LTE_ON"="LTE: On";
+"LTE_OFF"="LTE: Off";
+"VPN_ON"="VPN: On";
+"VPN_OFF"="VPN: Off";
+"SILENT_VIBRATE_ON"="Vibrate on Slient: On";
+"SILENT_VIBRATE_OFF"="Vibrate on Slient: Off";
+"RING_VIBRATE_ON"="Vibrate on Ring: On";
+"RING_VIBRATE_OFF"="Vibrate on Ring: Off";
+"AUTO_LOCK_NEVER"="Auto-Lock: Never";
+"AUTO_LOCK_MIN"="Auto-Lock: %d Minute";
+"AUTO_LOCK_MINS"="Auto-Lock: %d Minutes";
+"KILL_BG_DEVICE_LOCK"="Kill Background: Device Locked";
+"KILL_BG_APP"="Kill Background: %d App";
+"KILL_BG_APPS"="Kill Background: %d Apps";
+"CLEAR_BADGE_BADGE"="Clear Badge: %d Badge";
+"CLEAR_BADGE_BADGES"="Clear Badge: %d Badges";
+"FLUX_ON"="f.lux: On";
+"FLUX_OFF"="f.lux: Off";
+
+"PERSONAL_HOTSPOT_DATA_OFF_TITLE"="Cellular Data Off";
+"PERSONAL_HOTSPOT_DATA_OFF_MESSAGE"="Personal Hotspot will only available when Cellular Data on. Please turn on Cellular Data first.";
+"PERSONAL_HOTSPOT_DATA_OFF_CANCEL"="OK";
+
+"SHOTDOWN_MESSAGE"="The device will shutdown.";
+"SHOTDOWN_CANCEL"="Cancel";
+"SHOTDOWN_SURE"="Sure";
+
+"REBOOT_MESSAGE"="The device will reboot.";
+"REBOOT_CANCEL"="Cancel";
+"REBOOT_SURE"="Sure";
+
+"RESPRING_MESSAGE"="SpringBoard will relaunch.";
+"RESPRING_CANCEL"="Cancel";
+"RESPRING_SURE"="Sure";
+
+"VPN_TITLE"="VPN";
+"VPN_NO_CONNECTION_MESSAGE"="Please setup a VPN connection";
+"VPN_NO_PASSWORD_MESSAGE"="Please setup password";
+"VPN_CANCEL"="OK";

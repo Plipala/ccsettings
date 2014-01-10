@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>data</key>
+	<integer>0</integer>
+	<key>wifi</key>
+	<integer>1</integer>
+	<key>airplaneMode</key>
+	<integer>2</integer>
+	<key>location</key>
+	<integer>3</integer>
+	<key>doNotDisturb</key>
+	<integer>4</integer>
+	<key>home</key>
+	<integer>5</integer>
+	<key>lock</key>
+	<integer>6</integer>
+	<key>bluetooth</key>
+	<integer>7</integer>
+	<key>hotspot</key>
+	<integer>8</integer>
+	<key>orientationLock</key>
+	<integer>9</integer>
+	<key>mute</key>
+	<integer>10</integer>
+	<key>vibrate</key>
+	<integer>11</integer>
+	<key>screenShot</key>
+	<integer>12</integer>
+	<key>3G4GLTE</key>
+	<integer>13</integer>
+	<key>VPN</key>
+	<integer>14</integer>
+	<key>autoLock</key>
+	<integer>15</integer>
+	<key>killbackground</key>
+	<integer>16</integer>
+	<key>clearBadge</key>
+	<integer>17</integer>
+	<key>shutdown</key>
+	<integer>18</integer>
+	<key>reboot</key>
+	<integer>19</integer>
+	<key>respring</key>
+	<integer>20</integer>
+	<key>flux</key>
+	<integer>-1</integer>
+</dict>
+</plist>
