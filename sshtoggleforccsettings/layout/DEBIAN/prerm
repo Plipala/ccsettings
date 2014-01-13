@@ -1,0 +1,4 @@
+#!/bin/bash
+/bin/launchctl unload /System/Library/LaunchDaemons/com.plipala.ccsettingssupport.plist
+exit 0
+ 

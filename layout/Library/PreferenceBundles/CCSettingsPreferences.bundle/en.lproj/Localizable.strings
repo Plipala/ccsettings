@@ -18,6 +18,7 @@
 "autoLock"="Auto-Lock";
 "killbackground"="Kill Background";
 "clearBadge"="Clear Badge";
+"ssh"="OpenSSH";
 
 "Enabled"="INCLUDE";
 "Disabled"="DO NOT INCLUDE";

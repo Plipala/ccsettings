@@ -14,3 +14,4 @@ CCSettingsPreferences_PRIVATE_FRAMEWORKS = Preferences
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 include $(THEOS_MAKE_PATH)/bundle.mk
+include $(THEOS_MAKE_PATH)/aggregate.mk

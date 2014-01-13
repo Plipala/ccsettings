@@ -1,0 +1,12 @@
+#!/bin/bash
+declare -a cydia
+cydia=($CYDIA)
+
+chown root:wheel /System/Library/LaunchDaemons/com.plipala.ccsettingssupport.plist
+chmod 644 /System/Library/LaunchDaemons/com.plipala.ccsettingssupport.plist
+/bin/launchctl load -w /System/Library/LaunchDaemons/com.plipala.ccsettingssupport.plist
+
+if [[ ${CYDIA+@} ]]; then
+	eval "echo 'finish:restart' >&${cydia[0]}"
+fi
+exit 0

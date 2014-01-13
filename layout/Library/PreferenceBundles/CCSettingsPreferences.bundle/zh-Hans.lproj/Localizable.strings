@@ -19,6 +19,7 @@
 "killbackground"="后台清理";
 "clearBadge"="角标清理";
 "flux"="f.lux";
+"ssh"="OpenSSH";
 
 "Enabled"="包括";
 "Disabled"="不包括";

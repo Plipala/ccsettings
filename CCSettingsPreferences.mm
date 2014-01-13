@@ -79,6 +79,13 @@ static void _callback(){
                     continue;
                 }
             }
+            if ([identifier isEqualToString:@"ssh"])
+            {
+                if (!([[NSFileManager defaultManager] fileExistsAtPath:@"/usr/bin/ccsettingssupport"] && [[NSFileManager defaultManager] fileExistsAtPath:@"/Library/LaunchDaemons/com.openssh.sshd.plist"]))
+                {
+                    continue;
+                }
+            }
             if ([_customlizeOrderDictionary objectForKey:identifier] != nil)
             {
                 if ([[_customlizeOrderDictionary objectForKey:identifier] intValue] >= 0)

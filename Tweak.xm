@@ -374,6 +374,12 @@ static void CCSettingsSetDismissLockStatus(NSInteger loading) {
 -(void)_setFlux:(BOOL)enabled;
 -(void)_updateFluxButtonState;
 
+-(BOOL)_sshAvailable;
+-(BOOL)_getSSH;
+-(void)_setSSH:(BOOL)enabled;
+-(void)_backgroundUpdateSSHButtonStatus;
+-(void)_setSSHButtonStatus:(NSNumber *)enabled;
+-(void)_updateSSHButtonStatus;
 
 @end
 
@@ -598,6 +604,13 @@ static void fluxCallback(CFNotificationCenterRef center, void *observer, CFStrin
 				return;
 			}
 		}
+		if (setting == 24)
+		{
+			if (![self _sshAvailable])
+			{
+				return;
+			}
+		}
 		NSString *idenfitierForSetting = [self _identifierForSetting:setting];
 		NSString *modeSeting = [self _RATModeString];
 		if (setting == 13 || setting == 14 || setting ==15)
@@ -679,6 +692,10 @@ static void fluxCallback(CFNotificationCenterRef center, void *observer, CFStrin
 		if (setting == 23)
 		{
 			buttonImage = [UIImage imageWithContentsOfFile:@"/Library/Application Support/CCSettings/ControlCenterGlyphFlux.png"];
+		}
+		if (setting == 24)
+		{
+			buttonImage = [UIImage imageWithContentsOfFile:@"/Library/Application Support/CCSettings/ControlCenterGlyphSSH.png"];
 		}
 		id button = [objc_getClass("SBControlCenterButton") circularButtonWithGlyphImage:buttonImage];
 		[button setIdentifier:idenfitierForSetting];
@@ -785,6 +802,10 @@ static void fluxCallback(CFNotificationCenterRef center, void *observer, CFStrin
 		{
 			return @"flux";
 		}
+		if (setting == 24)
+		{
+			return @"ssh";
+		}
 	}
 	return nil;
 }
@@ -859,6 +880,10 @@ static void fluxCallback(CFNotificationCenterRef center, void *observer, CFStrin
 		{
 			[self _setFlux:[(UIButton*)tapped isSelected]];
 		}
+		if (tapped.tag == 24)
+		{
+			[self _setSSH:[(UIButton*)tapped isSelected]];
+		}
 	}
 }
 
@@ -921,9 +946,9 @@ static void fluxCallback(CFNotificationCenterRef center, void *observer, CFStrin
 	int button = 6;
 	do
 		[self _addButtonForSetting:button ++];
-	while (button != 24);
-	[self _captureButtonForSetting:21];
-	[self _captureButtonForSetting:22];
+	while (button != 25);
+	[self _captureButtonForSetting:23];
+	[self _captureButtonForSetting:24];
 	[self _updateLocationButtonState];
 	[self _update3GButtonState];
 	if ([self _fluxAvailable])
@@ -938,6 +963,10 @@ static void fluxCallback(CFNotificationCenterRef center, void *observer, CFStrin
 	[self _updateHotspotButtonState];
 	[self _updateAutoLockButtonState];
 	[(id)self performSelectorOnMainThread:@selector(_updateVPNButtonState) withObject:nil waitUntilDone:NO];
+	if ([self _sshAvailable])
+	{
+		[self _updateSSHButtonStatus];
+	}
 }
 
 -(void)_updateMuteButtonState{
@@ -1895,6 +1924,70 @@ static NSTimer *homeMenuTimer = nil;
 %new
 -(void)_updateFluxButtonState{
 	[[self _buttonForSetting:23] setSelected:[self _getFlux]];
+}
+
+%new
+-(BOOL)_sshAvailable{
+	return [[NSFileManager defaultManager] fileExistsAtPath:@"/usr/bin/ccsettingssupport"] && [[NSFileManager defaultManager] fileExistsAtPath:@"/Library/LaunchDaemons/com.openssh.sshd.plist"];
+}
+
+%new
+-(BOOL)_getSSH{
+	BOOL status = NO;
+	notify_post("com.ccsettings.ssh.status");
+	usleep(100);
+	NSString *string = [NSString stringWithContentsOfFile:@"/tmp/sshstatus" encoding:NSUTF8StringEncoding error:nil];
+	if (string != nil && [string intValue] > 0)
+	{
+		status = YES;
+	}
+	return status;
+}
+
+%new
+-(void)_setSSH:(BOOL)enabled{
+	if (enabled)
+	{
+		notify_post("com.ccsettings.ssh.on");
+	}
+	else 
+	{
+		notify_post("com.ccsettings.ssh.off");
+	}
+	NSString *updateString = nil;
+    if (enabled)
+    {
+    	updateString = [localBundle localizedStringForKey:@"SSH_ON" value:@"" table:nil];
+    }
+    else {
+    	updateString = [localBundle localizedStringForKey:@"SSH_OFF" value:@"" table:nil];
+    }
+
+    if (objc_getClass("SBControlCenterStatusUpdate"))
+    {
+    	id statusUpdate = [objc_getClass("SBControlCenterStatusUpdate") statusUpdateWithString:updateString reason:[self _identifierForSetting:24]];
+    	[[self delegate] section:self publishStatusUpdate:statusUpdate];
+
+    }
+    else {
+		[[self delegate] section:self updateStatusText:updateString reason:[self _identifierForSetting:23]];
+    }
+}
+
+%new
+-(void)_backgroundUpdateSSHButtonStatus{
+	BOOL status = [self _getSSH];
+	[(id)self performSelectorOnMainThread:@selector(_setSSHButtonStatus:) withObject:[NSNumber numberWithInt:status] waitUntilDone:YES];
+}
+
+%new
+-(void)_setSSHButtonStatus:(NSNumber *)enabled{
+	[[self _buttonForSetting:24] setSelected:[enabled intValue]];
+}
+
+%new
+-(void)_updateSSHButtonStatus{
+	[(id)self performSelectorInBackground:@selector(_backgroundUpdateSSHButtonStatus) withObject:nil];
 }
 
 %new

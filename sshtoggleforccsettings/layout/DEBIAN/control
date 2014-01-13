@@ -1,0 +1,9 @@
+Package: com.plipala.ccsettings.sshsupport
+Name: CCSettings SSH
+Version: 0.0.1
+Depends: com.plipala.ccsettings (>= 0.0.4)
+Architecture: iphoneos-arm
+Description: SSH support for CCSettings
+Maintainer: plipala <plipala@foxmail.com>
+Author: plipala <plipala@foxmail.com>
+Section: Tweaks

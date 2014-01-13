@@ -46,5 +46,7 @@
 	<integer>20</integer>
 	<key>flux</key>
 	<integer>-1</integer>
+	<key>ssh</key>
+	<integer>-1</integer>
 </dict>
 </plist>

@@ -26,6 +26,8 @@
 "CLEAR_BADGE_BADGES"="Clear Badge: %d Badges";
 "FLUX_ON"="f.lux: On";
 "FLUX_OFF"="f.lux: Off";
+"SSH_ON"="OpenSSH: On";
+"SSH_OFF"="OpenSSH: Off";
 
 "PERSONAL_HOTSPOT_DATA_OFF_TITLE"="Cellular Data Off";
 "PERSONAL_HOTSPOT_DATA_OFF_MESSAGE"="Personal Hotspot will only available when Cellular Data on. Please turn on Cellular Data first.";
