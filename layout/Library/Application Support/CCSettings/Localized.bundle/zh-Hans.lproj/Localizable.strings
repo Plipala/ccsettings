@@ -28,6 +28,8 @@
 "FLUX_OFF"="f.lux: 关闭";
 "SSH_ON"="OpenSSH: 开启";
 "SSH_OFF"="OpenSSH: 关闭";
+"WP_ON"="WallProxy: 开启";
+"WP_OFF"="WallProxy: 关闭";
 
 "PERSONAL_HOTSPOT_DATA_OFF_TITLE"="移动蜂窝数据已关闭";
 "PERSONAL_HOTSPOT_DATA_OFF_MESSAGE"="个人热点只有在开启移动蜂窝数据的时候使用，请先打开蜂窝数据。";

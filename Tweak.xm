@@ -381,6 +381,11 @@ static void CCSettingsSetDismissLockStatus(NSInteger loading) {
 -(void)_setSSHButtonStatus:(NSNumber *)enabled;
 -(void)_updateSSHButtonStatus;
 
+-(BOOL)_wpAvaiable;
+-(BOOL)_getWP;
+-(void)_setWP:(BOOL)enabled;
+-(void)_updateWPButtonStatus;
+
 @end
 
 @interface SBCCButtonLayoutView 
@@ -567,7 +572,7 @@ static void fluxCallback(CFNotificationCenterRef center, void *observer, CFStrin
 		return [NSNumber numberWithInteger:[[orderSetting objectForKey:identifier] intValue]];
 	}
 	else {
-		return [NSNumber numberWithInteger:100];
+		return [NSNumber numberWithInteger:-1];
 	}
 }
 
@@ -607,6 +612,13 @@ static void fluxCallback(CFNotificationCenterRef center, void *observer, CFStrin
 		if (setting == 24)
 		{
 			if (![self _sshAvailable])
+			{
+				return;
+			}
+		}
+		if (setting == 25)
+		{
+			if (![self _wpAvaiable])
 			{
 				return;
 			}
@@ -696,6 +708,10 @@ static void fluxCallback(CFNotificationCenterRef center, void *observer, CFStrin
 		if (setting == 24)
 		{
 			buttonImage = [UIImage imageWithContentsOfFile:@"/Library/Application Support/CCSettings/ControlCenterGlyphSSH.png"];
+		}
+		if (setting == 25)
+		{
+			buttonImage = [UIImage imageWithContentsOfFile:@"/Library/Application Support/CCSettings/ControlCenterGlyphWP.png"];
 		}
 		id button = [objc_getClass("SBControlCenterButton") circularButtonWithGlyphImage:buttonImage];
 		[button setIdentifier:idenfitierForSetting];
@@ -806,6 +822,10 @@ static void fluxCallback(CFNotificationCenterRef center, void *observer, CFStrin
 		{
 			return @"ssh";
 		}
+		if (setting == 25)
+		{
+			return @"wallproxy";
+		}
 	}
 	return nil;
 }
@@ -884,6 +904,10 @@ static void fluxCallback(CFNotificationCenterRef center, void *observer, CFStrin
 		{
 			[self _setSSH:[(UIButton*)tapped isSelected]];
 		}
+		if (tapped.tag == 25)
+		{
+			[self _setWP:[(UIButton*)tapped isSelected]];
+		}
 	}
 }
 
@@ -946,9 +970,7 @@ static void fluxCallback(CFNotificationCenterRef center, void *observer, CFStrin
 	int button = 6;
 	do
 		[self _addButtonForSetting:button ++];
-	while (button != 25);
-	[self _captureButtonForSetting:23];
-	[self _captureButtonForSetting:24];
+	while (button != 26);
 	[self _updateLocationButtonState];
 	[self _update3GButtonState];
 	if ([self _fluxAvailable])
@@ -967,6 +989,7 @@ static void fluxCallback(CFNotificationCenterRef center, void *observer, CFStrin
 	{
 		[self _updateSSHButtonStatus];
 	}
+	[(id)self performSelectorOnMainThread:@selector(_updateWPButtonStatus) withObject:nil waitUntilDone:NO];
 }
 
 -(void)_updateMuteButtonState{
@@ -1970,7 +1993,7 @@ static NSTimer *homeMenuTimer = nil;
 
     }
     else {
-		[[self delegate] section:self updateStatusText:updateString reason:[self _identifierForSetting:23]];
+		[[self delegate] section:self updateStatusText:updateString reason:[self _identifierForSetting:24]];
     }
 }
 
@@ -1988,6 +2011,51 @@ static NSTimer *homeMenuTimer = nil;
 %new
 -(void)_updateSSHButtonStatus{
 	[(id)self performSelectorInBackground:@selector(_backgroundUpdateSSHButtonStatus) withObject:nil];
+}
+
+%new
+-(BOOL)_wpAvaiable{
+	return [[NSFileManager defaultManager] fileExistsAtPath:@"/usr/bin/ccsettingssupport"] && [[NSFileManager defaultManager] fileExistsAtPath:@"/System/Library/LaunchDaemons/agae.wallproxy.plist"];
+}
+
+%new
+-(BOOL)_getWP{
+	return [[NSFileManager defaultManager] fileExistsAtPath:@"/var/log/wallproxy.log"];
+}
+
+%new
+-(void)_setWP:(BOOL)enabled{
+	if (enabled)
+	{
+		notify_post("com.ccsettings.wp.on");
+	}
+	else 
+	{
+		notify_post("com.ccsettings.wp.off");
+	}
+	NSString *updateString = nil;
+    if (enabled)
+    {
+    	updateString = [localBundle localizedStringForKey:@"WP_ON" value:@"" table:nil];
+    }
+    else {
+    	updateString = [localBundle localizedStringForKey:@"WP_OFF" value:@"" table:nil];
+    }
+
+    if (objc_getClass("SBControlCenterStatusUpdate"))
+    {
+    	id statusUpdate = [objc_getClass("SBControlCenterStatusUpdate") statusUpdateWithString:updateString reason:[self _identifierForSetting:25]];
+    	[[self delegate] section:self publishStatusUpdate:statusUpdate];
+
+    }
+    else {
+		[[self delegate] section:self updateStatusText:updateString reason:[self _identifierForSetting:25]];
+    }
+}
+
+%new
+-(void)_updateWPButtonStatus{
+	[[self _buttonForSetting:25] setSelected:[self _getWP]];
 }
 
 %new

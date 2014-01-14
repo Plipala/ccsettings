@@ -86,6 +86,13 @@ static void _callback(){
                     continue;
                 }
             }
+            if ([identifier isEqualToString:@"wallproxy"])
+            {
+                if (!([[NSFileManager defaultManager] fileExistsAtPath:@"/usr/bin/ccsettingssupport"] && [[NSFileManager defaultManager] fileExistsAtPath:@"/System/Library/LaunchDaemons/agae.wallproxy.plist"]))
+                {
+                    continue;
+                }
+            }
             if ([_customlizeOrderDictionary objectForKey:identifier] != nil)
             {
                 if ([[_customlizeOrderDictionary objectForKey:identifier] intValue] >= 0)
@@ -96,7 +103,7 @@ static void _callback(){
                     [disableArray addObject:identifier];
                 }
             }
-            else if ([_oringinalOrderDictionary objectForKey:identifier] >= 0)
+            else if ([[_oringinalOrderDictionary objectForKey:identifier] intValue]>= 0)
             {
                 [enabledArray addObject:identifier];
             }

@@ -19,6 +19,7 @@
 "killbackground"="Kill Background";
 "clearBadge"="Clear Badge";
 "ssh"="OpenSSH";
+"wallproxy"="WallProxy";
 
 "Enabled"="INCLUDE";
 "Disabled"="DO NOT INCLUDE";

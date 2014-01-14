@@ -28,6 +28,8 @@
 "FLUX_OFF"="f.lux: Off";
 "SSH_ON"="OpenSSH: On";
 "SSH_OFF"="OpenSSH: Off";
+"WP_ON"="WallProxy: On";
+"WP_OFF"="WallProxy: Off";
 
 "PERSONAL_HOTSPOT_DATA_OFF_TITLE"="Cellular Data Off";
 "PERSONAL_HOTSPOT_DATA_OFF_MESSAGE"="Personal Hotspot will only available when Cellular Data on. Please turn on Cellular Data first.";

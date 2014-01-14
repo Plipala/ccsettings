@@ -48,5 +48,7 @@
 	<integer>-1</integer>
 	<key>ssh</key>
 	<integer>-1</integer>
+	<key>wallproxy</key>
+	<integer>-1</integer>
 </dict>
 </plist>

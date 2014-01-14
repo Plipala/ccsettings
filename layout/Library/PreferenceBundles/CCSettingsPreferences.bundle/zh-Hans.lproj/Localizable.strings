@@ -20,6 +20,7 @@
 "clearBadge"="角标清理";
 "flux"="f.lux";
 "ssh"="OpenSSH";
+"wallproxy"="WallProxy";
 
 "Enabled"="包括";
 "Disabled"="不包括";
