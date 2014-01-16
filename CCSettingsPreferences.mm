@@ -1,5 +1,6 @@
 #import <UIKit/UIKit.h>
 #import <dlfcn.h>
+#import <notify.h>
 
 struct CopyDataInfo
 {
@@ -11,11 +12,35 @@ static void _callback(){
     //Do nothing;
 };
 
-@interface PSViewController : UIViewController
+@interface PSViewController : UIViewController {
+}
 - (id)initForContentSize:(CGSize)size;
+
 @end
 
-@interface CCSettingsPreferencesListController: PSViewController <UITableViewDelegate,UITableViewDataSource,UIAlertViewDelegate>{
+@interface PSListController : PSViewController {
+    NSArray* _specifiers;
+}
+@property(retain) NSArray* specifiers;
+-(NSArray*)loadSpecifiersFromPlistName:(NSString*)plistName target:(id)target;
+@end
+
+@interface CCSettingsAdvSettingViewController : PSListController
+@end
+
+@implementation CCSettingsAdvSettingViewController
+
+- (id)specifiers {
+    if(_specifiers == nil) {
+        _specifiers = [[self loadSpecifiersFromPlistName:@"CCSettingsAdvPreferences" target:self] retain];
+        NSLog(@"_specifiers %@",_specifiers);
+    }
+    return _specifiers;
+}
+
+@end
+
+@interface CCSettingsPreferencesListController: PSViewController <UITableViewDelegate,UITableViewDataSource>{
     UITableView *_tableView;
     NSMutableDictionary *_settingDataDictionary;
 }
@@ -23,6 +48,7 @@ static void _callback(){
 @end
 
 @implementation CCSettingsPreferencesListController
+
 - (void)save
 {
     NSMutableDictionary *_settingResult = [NSMutableDictionary dictionary];
@@ -38,12 +64,13 @@ static void _callback(){
     }
     [_settingResult writeToFile:@"/var/mobile/Library/Preferences/com.plipala.ccsettings.plist" atomically:YES];
 
-    NSString *message = [[NSBundle bundleWithIdentifier:@"com.plipala.ccsettingspreferences"] localizedStringForKey:@"RESPRING_MESSAGE" value:@"" table:nil];
-    NSString *cancelButtonTitle = [[NSBundle bundleWithIdentifier:@"com.plipala.ccsettingspreferences"] localizedStringForKey:@"RESPRING_CANCEL" value:@"" table:nil];
-    NSString *sureButtonTitle = [[NSBundle bundleWithIdentifier:@"com.plipala.ccsettingspreferences"] localizedStringForKey:@"RESPRING_SURE" value:@"" table:nil];
-    UIAlertView *alertView = [[[UIAlertView alloc] initWithTitle:message message:nil delegate:self cancelButtonTitle:cancelButtonTitle otherButtonTitles:sureButtonTitle,nil] autorelease];
-    alertView.tag = 12306;
-    [alertView show];
+    notify_post("com.plipala.ccsettings.orderchanged");
+}
+
+-(void)infoButtonAction:(id)sender{
+    CCSettingsAdvSettingViewController *vc = [[CCSettingsAdvSettingViewController alloc] initForContentSize:_tableView.frame.size];
+    [self.navigationController pushViewController:vc animated:YES];
+    [vc release];
 }
 
 - (id)initForContentSize:(CGSize)size{
@@ -54,16 +81,19 @@ static void _callback(){
     if (self) {
         [[self navigationItem] setTitle:@"CCSettings"];
         
-        UIBarButtonItem* saveButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(save)];
-        [[self navigationItem] setRightBarButtonItem:saveButton];
-        [saveButton release];
-        
         _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0,0,size.width,size.height) style:UITableViewStyleGrouped];
         _tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         _tableView.editing = YES;
         _tableView.delegate = self;
         _tableView.dataSource = self;
         _tableView.allowsSelectionDuringEditing = YES;
+
+        UIImage *settingImage = [UIImage imageWithContentsOfFile:[[NSBundle bundleWithIdentifier:@"com.plipala.ccsettingspreferences"] pathForResource:@"settings@2x" ofType:@"png"]];
+        UIBarButtonItem* infoButton = [[UIBarButtonItem alloc] initWithImage:settingImage style:UIBarButtonItemStyleBordered target:self action:@selector(infoButtonAction:)];
+        UIBarButtonItem *negativeSpacer = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+        negativeSpacer.width = -10;
+        [[self navigationItem] setRightBarButtonItems:[NSArray arrayWithObjects:negativeSpacer,infoButton,nil]];
+        [infoButton release];
         
         NSMutableArray *enabledArray = [NSMutableArray array];
         NSMutableArray *disableArray = [NSMutableArray array];
@@ -285,6 +315,7 @@ static void _callback(){
         }
         [orig release];
     }
+    [self save];
 }
 
 -(NSDictionary *)_getRATState:(NSDictionary *)stateDictionary{
@@ -393,10 +424,8 @@ static void _callback(){
     return  RATMode;
 }
 
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
-    if (buttonIndex != [alertView cancelButtonIndex]) {
-        system("killall SpringBoard");
-    }
+-(void)viewWillDisappear:(BOOL)animated{
+    [self save];
 }
 
 @end

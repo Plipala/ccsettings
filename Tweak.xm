@@ -194,6 +194,7 @@ static void CCSettingsSetDismissLockStatus(NSInteger loading) {
 -(void)dealloc;
 -(void)addButton:(id)button;
 -(void)removeButton:(id)button;
+-(void)removeAllButtons;
 -(id)buttons;
 -(void)layoutSubviews;
 @end
@@ -245,6 +246,14 @@ static void CCSettingsSetDismissLockStatus(NSInteger loading) {
 		[(UIView*)button removeFromSuperview];
 		[self setNeedsLayout];
 	}
+}
+
+-(void)removeAllButtons{
+	for (id button in _buttons)
+	{
+		[(UIView*)button removeFromSuperview];
+	}
+	[_buttons removeAllObjects];
 }
 
 -(id)buttons{
@@ -307,6 +316,7 @@ static void CCSettingsSetDismissLockStatus(NSInteger loading) {
 
 //CCSettingsAdded
 -(NSNumber *)_orderForSetting:(int)setting;
+-(void)_reloadButtons;
 
 -(void)_initData;
 -(void)_tearDownData;
@@ -522,6 +532,19 @@ static void fluxCallback(CFNotificationCenterRef center, void *observer, CFStrin
 	[(SBCCSettingsSectionController*)observer _updateFluxButtonState];
 }
 
+static void ccsettingsOrderChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
+{
+	@synchronized(orderSetting) {
+		[orderSetting release];
+		orderSetting = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.plipala.ccsettings.plist"];
+		if (orderSetting == nil)
+		{
+			orderSetting = [[NSDictionary alloc] initWithContentsOfFile:@"/Library/Application Support/CCSettings/CCSettingsOrder.plist"];
+		}
+	}
+	[(SBCCSettingsSectionController*)observer _reloadButtons];
+}
+
 %group WirelessModemController
 %hook WirelessModemController
 - (void)_btPowerChangedHandler:(NSNotification *)notification
@@ -573,6 +596,34 @@ static void fluxCallback(CFNotificationCenterRef center, void *observer, CFStrin
 	}
 	else {
 		return [NSNumber numberWithInteger:-1];
+	}
+}
+
+%new
+-(void)_reloadButtons{
+	[[self view] removeAllButtons];
+	int setting = 0;
+	do {
+		if ([[self _orderForSetting:setting] intValue] >= 0)
+		{
+			id button = [self _buttonForSetting:setting];
+			if (button)
+			{
+				[button setSortKey:[self _orderForSetting:setting]];
+				[[self view] addButton:button];
+			}
+			else {
+				[self _addButtonForSetting:setting];
+			}
+		}
+		setting++;
+	}
+	while (setting != 26);
+	[self _updateLocationButtonState];
+	[self _update3GButtonState];
+	if ([self _fluxAvailable])
+	{
+		[self _updateFluxButtonState];
 	}
 }
 
@@ -977,6 +1028,8 @@ static void fluxCallback(CFNotificationCenterRef center, void *observer, CFStrin
 	{
 		[self _updateFluxButtonState];
 	}
+
+	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), self, &ccsettingsOrderChanged, CFSTR("com.plipala.ccsettings.orderchanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
 }
 
 -(void)viewWillAppear:(BOOL)view{
@@ -1837,10 +1890,10 @@ static NSTimer *homeMenuTimer = nil;
 	NSString *updateString = nil;
 	if (count > 1)
 	{
-		updateString = [NSString stringWithFormat:[localBundle localizedStringForKey:@"KILL_BG_APP" value:@"" table:nil],count];
+		updateString = [NSString stringWithFormat:[localBundle localizedStringForKey:@"KILL_BG_APPS" value:@"" table:nil],count];
 	}
 	else {
-		updateString = [NSString stringWithFormat:[localBundle localizedStringForKey:@"KILL_BG_APPS" value:@"" table:nil],count];
+		updateString = [NSString stringWithFormat:[localBundle localizedStringForKey:@"KILL_BG_APP" value:@"" table:nil],count];
 	}
     if (objc_getClass("SBControlCenterStatusUpdate"))
     {
@@ -1879,10 +1932,10 @@ static NSTimer *homeMenuTimer = nil;
 	NSString *updateString = nil;
 	if (count > 1)
 	{
-		updateString = [NSString stringWithFormat:[localBundle localizedStringForKey:@"CLEAR_BADGE_BADGE" value:@"" table:nil],count];
+		updateString = [NSString stringWithFormat:[localBundle localizedStringForKey:@"CLEAR_BADGE_BADGES" value:@"" table:nil],count];
 	}
 	else {
-		updateString = [NSString stringWithFormat:[localBundle localizedStringForKey:@"CLEAR_BADGE_BADGES" value:@"" table:nil],count];
+		updateString = [NSString stringWithFormat:[localBundle localizedStringForKey:@"CLEAR_BADGE_BADGE" value:@"" table:nil],count];
 	}
     if (objc_getClass("SBControlCenterStatusUpdate"))
     {

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>items</key>
+	<array>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>General</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>default</key>
+			<integer>5</integer>
+			<key>defaults</key>
+			<string>com.plipala.ccsettings.preferencesChanged</string>
+			<key>key</key>
+			<string>TOGGLES_PER_LINE</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>label</key>
+			<string>Toggles per line</string>
+			<key>validValues</key>
+			<array>
+				<integer>4</integer>
+				<integer>5</integer>
+				<integer>6</integer>
+			</array>
+			<key>validTitles</key>
+			<array>
+				<string>4</string>
+				<string>5</string>
+				<string>6</string>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.plipala.ccsettings.preferences</string>
+			<key>key</key>
+			<string>DISSMISS_CONTROL_CENTER</string>
+			<key>label</key>
+			<string>Dismiss Control Center</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>3G/4G/LTE</string>
+			<key>footerText</key>
+			<string>Change network mode may cause network problem.</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>label</key>
+			<string>Network Mode</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>default</key>
+			<integer>0</integer>
+			<key>key</key>
+			<string>NETWORK_MODE</string>
+			<key>defaults</key>
+			<string>com.plipala.ccsettings.preferences</string>
+			<key>PostNotification</key>
+			<string>com.plipala.ccsettings.preferencesChanged</string>
+			<key>validTitles</key>
+			<array>
+				<string>Auto</string>
+				<string>Force 3G</string>
+				<string>Switch to 2G when disable 4G</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Kill Background</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>label</key>
+			<string>Kill Music</string>
+			<key>default</key>
+			<false/>
+			<key>key</key>
+			<string>KILL_MUSIC</string>
+			<key>defaults</key>
+			<string>com.plipala.ccsettings.preferences</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>label</key>
+			<string>Dismiss Control Center</string>
+			<key>default</key>
+			<false/>
+			<key>key</key>
+			<string>KILL_MUSIC</string>
+			<key>defaults</key>
+			<string>com.plipala.ccsettings.preferences</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSListItemCell</string>
+			<key>label</key>
+			<string>White List</string>
+		</dict>
+	</array>
+	<key>title</key>
+	<string>Advanse</string>
+</dict>
+</plist>
