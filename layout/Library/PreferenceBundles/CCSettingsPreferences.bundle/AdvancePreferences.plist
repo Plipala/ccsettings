@@ -16,6 +16,8 @@
 			<key>default</key>
 			<integer>5</integer>
 			<key>defaults</key>
+			<string>com.plipala.ccsettings.preferences</string>
+			<key>PostNotification</key>
 			<string>com.plipala.ccsettings.preferencesChanged</string>
 			<key>key</key>
 			<string>TOGGLES_PER_LINE</string>
@@ -43,10 +45,20 @@
 			<false/>
 			<key>defaults</key>
 			<string>com.plipala.ccsettings.preferences</string>
+			<key>PostNotification</key>
+			<string>com.plipala.ccsettings.preferencesChanged</string>
 			<key>key</key>
-			<string>DISSMISS_CONTROL_CENTER</string>
+			<string>DISMISS_CONTROL_CENTER</string>
 			<key>label</key>
-			<string>Dismiss Control Center</string>
+			<string>Dismiss control center</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>label</key>
+			<string>Hide when locked</string>
+			<key>detail</key>
+			<string>CCSettingsPreferencesHideWhenLockedListController</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -54,13 +66,13 @@
 			<key>label</key>
 			<string>3G/4G/LTE</string>
 			<key>footerText</key>
-			<string>Change network mode may cause network problem.</string>
+			<string>Change data rate may cause network problem.</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSLinkListCell</string>
 			<key>label</key>
-			<string>Network Mode</string>
+			<string>Data rate</string>
 			<key>detail</key>
 			<string>PSListItemsController</string>
 			<key>default</key>
@@ -94,34 +106,40 @@
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>label</key>
-			<string>Kill Music</string>
+			<string>Kill music</string>
 			<key>default</key>
 			<false/>
 			<key>key</key>
 			<string>KILL_MUSIC</string>
 			<key>defaults</key>
 			<string>com.plipala.ccsettings.preferences</string>
+			<key>PostNotification</key>
+			<string>com.plipala.ccsettings.preferencesChanged</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>label</key>
-			<string>Dismiss Control Center</string>
+			<string>Dismiss control center</string>
 			<key>default</key>
 			<false/>
 			<key>key</key>
-			<string>KILL_MUSIC</string>
+			<string>DISMISS_CONTROL_CENTER_KB</string>
 			<key>defaults</key>
 			<string>com.plipala.ccsettings.preferences</string>
+			<key>PostNotification</key>
+			<string>com.plipala.ccsettings.preferencesChanged</string>
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSListItemCell</string>
+			<string>PSLinkCell</string>
 			<key>label</key>
-			<string>White List</string>
+			<string>White list</string>
+			<key>detail</key>
+			<string>CCSettingsWhiteListController</string>
 		</dict>
 	</array>
 	<key>title</key>
-	<string>Advanse</string>
+	<string>Advance</string>
 </dict>
 </plist>

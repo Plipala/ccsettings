@@ -51,6 +51,14 @@ static void _callback(){
 
 static NSBundle *localBundle = nil;
 static NSDictionary *orderSetting = nil;
+static int CCSTogglePerLine = 5;
+static BOOL CCSDismissControlCenter = NO;
+static int CCSNetworkMode = 0;
+static BOOL CCSKillMusic = NO;
+static BOOL CCSDismissControlCenterKB = NO;
+static NSDictionary *hideWhenLocked = nil;
+static BOOL lastLockStatus = YES;
+static NSDictionary *whiteList = nil;
 
 @interface UIView (Private)
 -(BOOL)_shouldAnimatePropertyWithKey:(id)key;
@@ -77,6 +85,7 @@ static NSDictionary *orderSetting = nil;
 @interface SBMediaController
 +(id)sharedInstance;
 -(id)nowPlayingApplication;
+-(BOOL)isPlaying;
 @end
 
 @interface SBUIController
@@ -267,34 +276,34 @@ static void CCSettingsSetDismissLockStatus(NSInteger loading) {
 		if (self.frame.size.width > self.frame.size.height)
 		{
 			CGSize _buttonSize = ((UIView*)[_buttons objectAtIndex:0]).frame.size;
-			float _buttonPending = (self.frame.size.width - 32 - _buttonSize.width * 5 - _contentEdgeInsets.left - _contentEdgeInsets.right) / 4;
+			float _buttonPending = (self.frame.size.width - 32 - _buttonSize.width * CCSTogglePerLine - _contentEdgeInsets.left - _contentEdgeInsets.right) / (CCSTogglePerLine - 1);
 			float _buttonTop = round((self.frame.size.height) - _contentEdgeInsets.top - _contentEdgeInsets.bottom - _buttonSize.height) / 2.0f;
 
 			for (int i = 0; i < [_buttons count]; ++i)
 			{
 				UIView *button = [_buttons objectAtIndex:i];
-				int _page = i / 5;
-				int _loc = i % 5;
+				int _page = i / CCSTogglePerLine;
+				int _loc = i % CCSTogglePerLine;
 				int _buttonOrigX = round((16 + _contentEdgeInsets.left + _buttonSize.width * _loc +  _buttonPending * _loc + self.frame.size.width * _page) * 2) / 2.0f;
 				button.frame = CGRectMake(_buttonOrigX, _buttonTop, button.frame.size.width, button.frame.size.height);
 			}
-			int _totalPage = [_buttons count] / 5 + (([_buttons count] % 5 > 0)?1:0);
+			int _totalPage = [_buttons count] / CCSTogglePerLine + (([_buttons count] % CCSTogglePerLine > 0)?1:0);
 			[_layview setContentSize:CGSizeMake(_layview.frame.size.width * _totalPage, _layview.frame.size.height)];
 		}
 		else {
 			CGSize _buttonSize = ((UIView*)[_buttons objectAtIndex:0]).frame.size;
-			float _buttonPending = (self.frame.size.height - 32 - _buttonSize.height * 5 - _contentEdgeInsets.top - _contentEdgeInsets.bottom) / 4;
+			float _buttonPending = (self.frame.size.height - 32 - _buttonSize.height * CCSTogglePerLine - _contentEdgeInsets.top - _contentEdgeInsets.bottom) / (CCSTogglePerLine -1);
 			float _buttonLeft = round((self.frame.size.width) - _contentEdgeInsets.left - _contentEdgeInsets.right - _buttonSize.width) / 2.0f;
 
 			for (int i = 0; i < [_buttons count]; ++i)
 			{
 				UIView *button = [_buttons objectAtIndex:i];
-				int _page = i / 5;
-				int _loc = i % 5;
+				int _page = i / CCSTogglePerLine;
+				int _loc = i % CCSTogglePerLine;
 				int _buttonOrigY = round((16 + _contentEdgeInsets.top + _buttonSize.height * _loc +  _buttonPending * _loc + self.frame.size.height * _page) * 2) / 2.0f;
 				button.frame = CGRectMake(_buttonLeft, _buttonOrigY, button.frame.size.width, button.frame.size.height);
 			}
-			int _totalPage = ([_buttons count] - 1) / 5 + ((([_buttons count] - 1) % 5 > 0)?1:0);
+			int _totalPage = ([_buttons count] - 1) / CCSTogglePerLine + ((([_buttons count] - 1) % CCSTogglePerLine > 0)?1:0);
 			[_layview setContentSize:CGSizeMake(_layview.frame.size.width , _layview.frame.size.height * _totalPage)];
 		}
 	}
@@ -315,6 +324,7 @@ static void CCSettingsSetDismissLockStatus(NSInteger loading) {
 -(BOOL)_getMuted;
 
 //CCSettingsAdded
+-(void)_loadSettings;
 -(NSNumber *)_orderForSetting:(int)setting;
 -(void)_reloadButtons;
 
@@ -484,29 +494,35 @@ static void locationCallback(CFNotificationCenterRef center, void *observer, CFS
     [(SBCCSettingsSectionController*)observer _updateLocationButtonState];
 }
 
+
+
 static void registrationDataStatusChanged(CFNotificationCenterRef center, void* observer, CFStringRef name, const void* object, CFDictionaryRef userInfo) {
+	NSString *oldModeSeting = [(SBCCSettingsSectionController*)observer _RATModeString];
     [(SBCCSettingsSectionController*)observer _getRATState:(NSDictionary*)userInfo];
     NSString *modeString = [(SBCCSettingsSectionController*)observer _RATModeString];
-    for (int i = 13; i < 16; ++i)
+    if ([oldModeSeting compare:modeString])
     {
-    	if ([modeString compare:[(SBCCSettingsSectionController*)observer _identifierForSetting:i]])
-    	{
-    		id button = [(SBCCSettingsSectionController*)observer _buttonForSetting:i];
-    		[[(SBCCSettingsSectionController*)observer view] removeButton:button];
-    	}
-    	else {
-    		id button = [(SBCCSettingsSectionController*)observer _buttonForSetting:i];
-    		if (button != nil)
-    		{
-    			[[(SBCCSettingsSectionController*)observer view] addButton:button];
-    		}
-    		else {
-    			[(SBCCSettingsSectionController*)observer _addButtonForSetting:i];
-    		}
-    		
-    	}
-    	[(SBCCSettingsSectionController*)observer _update3GButtonState];
+    	for (int i = 13; i < 16; ++i)
+	    {
+	    	if ([modeString compare:[(SBCCSettingsSectionController*)observer _identifierForSetting:i]])
+	    	{
+	    		id button = [(SBCCSettingsSectionController*)observer _buttonForSetting:i];
+	    		[[(SBCCSettingsSectionController*)observer view] removeButton:button];
+	    	}
+	    	else {
+	    		id button = [(SBCCSettingsSectionController*)observer _buttonForSetting:i];
+	    		if (button != nil)
+	    		{
+	    			[[(SBCCSettingsSectionController*)observer view] addButton:button];
+	    		}
+	    		else {
+	    			[(SBCCSettingsSectionController*)observer _addButtonForSetting:i];
+	    		}
+	    		
+	    	}
+	    }
     }
+    [(SBCCSettingsSectionController*)observer _update3GButtonState];
 }
 
 static void vibrateCallback(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)   
@@ -544,6 +560,88 @@ static void ccsettingsOrderChanged(CFNotificationCenterRef center, void *observe
 	}
 	[(SBCCSettingsSectionController*)observer _reloadButtons];
 }
+
+static void ccsettingsPreferencesChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
+{
+	NSDictionary *settings = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.plipala.ccsettings.preferences.plist"];
+	if (settings != nil)
+	{
+		if ([settings objectForKey:@"TOGGLES_PER_LINE"] != nil)
+		{
+			int togglesPerLine = [[settings objectForKey:@"TOGGLES_PER_LINE"] intValue];
+			if (togglesPerLine != CCSTogglePerLine)
+			{
+				CCSTogglePerLine = togglesPerLine;
+				[(SBCCSettingsSectionController*)observer _reloadButtons];
+			}
+		}
+		if ([settings objectForKey:@"DISMISS_CONTROL_CENTER"])
+		{
+			CCSDismissControlCenter = [[settings objectForKey:@"DISMISS_CONTROL_CENTER"] boolValue];
+		}
+		if ([settings objectForKey:@"NETWORK_MODE"])
+		{
+			int networkMode = [[settings objectForKey:@"NETWORK_MODE"] intValue];
+			if (networkMode != CCSNetworkMode)
+			{
+				CCSNetworkMode = networkMode;
+				NSString *modeString = [(SBCCSettingsSectionController*)observer _RATModeString];
+		    	for (int i = 13; i < 16; ++i)
+			    {
+			    	if ([modeString compare:[(SBCCSettingsSectionController*)observer _identifierForSetting:i]])
+			    	{
+			    		id button = [(SBCCSettingsSectionController*)observer _buttonForSetting:i];
+			    		[[(SBCCSettingsSectionController*)observer view] removeButton:button];
+			    	}
+			    	else {
+			    		id button = [(SBCCSettingsSectionController*)observer _buttonForSetting:i];
+			    		if (button != nil)
+			    		{
+			    			[[(SBCCSettingsSectionController*)observer view] addButton:button];
+			    		}
+			    		else {
+			    			[(SBCCSettingsSectionController*)observer _addButtonForSetting:i];
+			    		}
+			    		
+			    	}
+			    }
+			}
+			[(SBCCSettingsSectionController*)observer _update3GButtonState];
+		}
+		if ([settings objectForKey:@"KILL_MUSIC"])
+		{
+			CCSKillMusic = [[settings objectForKey:@"KILL_MUSIC"] boolValue];
+		}
+		if ([settings objectForKey:@"DISMISS_CONTROL_CENTER_KB"])
+		{
+			CCSDismissControlCenterKB = [[settings objectForKey:@"DISMISS_CONTROL_CENTER_KB"] boolValue];
+		}
+	}
+}
+
+static void ccsettingsHideWhenLockedChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo){
+	@synchronized(hideWhenLocked) {
+		[hideWhenLocked release];
+		hideWhenLocked = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.plipala.ccsettings.hidewhenlocked.plist"];
+		if (hideWhenLocked == nil)
+		{
+			hideWhenLocked = [[NSDictionary alloc] init];
+		}
+	}
+	[(SBCCSettingsSectionController*)observer _reloadButtons];
+}
+
+static void ccsettingsWhiteListChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo){
+	@synchronized(whiteList) {
+		[whiteList release];
+		whiteList = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.plipala.ccsettings.whitelist.plist"];
+		if (whiteList == nil)
+		{
+			whiteList = [[NSDictionary alloc] init];
+		}
+	}
+}
+
 
 %group WirelessModemController
 %hook WirelessModemController
@@ -589,6 +687,13 @@ static void ccsettingsOrderChanged(CFNotificationCenterRef center, void *observe
 	if (setting == 13 || setting == 14 || setting ==15)
 	{
 		identifier = @"3G4GLTE";
+	}
+	if (lastLockStatus == YES)
+	{
+		if ([[hideWhenLocked objectForKey:identifier] boolValue])
+		{
+			return [NSNumber numberWithInteger:-1];
+		}
 	}
 	if ([orderSetting objectForKey:identifier])
 	{
@@ -960,6 +1065,14 @@ static void ccsettingsOrderChanged(CFNotificationCenterRef center, void *observe
 			[self _setWP:[(UIButton*)tapped isSelected]];
 		}
 	}
+
+	if (CCSDismissControlCenter)
+	{
+		if (tapped.tag != 9 && tapped.tag != 16 && tapped.tag != 19 && tapped.tag != 21)
+		{
+			[[objc_getClass("SBControlCenterController") sharedInstance] performSelector:@selector(handleMenuButtonTap) withObject:nil afterDelay:0.8f];
+		}
+	}
 }
 
 %new
@@ -1017,11 +1130,15 @@ static void ccsettingsOrderChanged(CFNotificationCenterRef center, void *observe
 }
 
 -(void)viewDidLoad{
+	[self _loadSettings];
+	lastLockStatus = [(SpringBoard*)[UIApplication sharedApplication] isLocked];
+	
 	%orig;
 	int button = 6;
 	do
 		[self _addButtonForSetting:button ++];
 	while (button != 26);
+	
 	[self _updateLocationButtonState];
 	[self _update3GButtonState];
 	if ([self _fluxAvailable])
@@ -1030,10 +1147,19 @@ static void ccsettingsOrderChanged(CFNotificationCenterRef center, void *observe
 	}
 
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), self, &ccsettingsOrderChanged, CFSTR("com.plipala.ccsettings.orderchanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
+	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), self, &ccsettingsPreferencesChanged, CFSTR("com.plipala.ccsettings.preferencesChanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
+	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), self, &ccsettingsHideWhenLockedChanged, CFSTR("com.plipala.ccsettings.hideWhenLockedChanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
+	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), self, &ccsettingsWhiteListChanged, CFSTR("com.plipala.ccsettings.whiteListChanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
 }
 
 -(void)viewWillAppear:(BOOL)view{
-	//just eat it;
+	BOOL lockedStatus = [(SpringBoard*)[UIApplication sharedApplication] isLocked];
+	if (lastLockStatus != lockedStatus && [hideWhenLocked count] > 0)
+	{
+		lastLockStatus = lockedStatus;
+		[self _reloadButtons];
+	}
+
 	[(UIScrollView*)[[self view] valueForKey:@"_layview"] setContentOffset:CGPointMake(0,0) animated:NO];
 	[self _updateHotspotButtonState];
 	[self _updateAutoLockButtonState];
@@ -1048,6 +1174,35 @@ static void ccsettingsOrderChanged(CFNotificationCenterRef center, void *observe
 -(void)_updateMuteButtonState{
 	%orig;
 	[self _updateVibrateButtonState];
+}
+
+%new
+-(void)_loadSettings{
+	NSDictionary *settings = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.plipala.ccsettings.preferences.plist"];
+	NSLog(@"settings %@",settings);
+	if (settings != nil)
+	{
+		if ([settings objectForKey:@"TOGGLES_PER_LINE"] != nil)
+		{
+			CCSTogglePerLine = [[settings objectForKey:@"TOGGLES_PER_LINE"] intValue];
+		}
+		if ([settings objectForKey:@"DISMISS_CONTROL_CENTER"])
+		{
+			CCSDismissControlCenter = [[settings objectForKey:@"DISMISS_CONTROL_CENTER"] boolValue];
+		}
+		if ([settings objectForKey:@"NETWORK_MODE"])
+		{
+			CCSNetworkMode = [[settings objectForKey:@"NETWORK_MODE"] intValue];
+		}
+		if ([settings objectForKey:@"KILL_MUSIC"])
+		{
+			CCSKillMusic = [[settings objectForKey:@"KILL_MUSIC"] boolValue];
+		}
+		if ([settings objectForKey:@"DISMISS_CONTROL_CENTER_KB"])
+		{
+			CCSDismissControlCenterKB = [[settings objectForKey:@"DISMISS_CONTROL_CENTER_KB"] boolValue];
+		}
+	}
 }
 
 %new
@@ -1359,6 +1514,10 @@ static NSLock *phReloadLock;
 %new
 -(NSString *)_RATModeString
 {
+	if (CCSNetworkMode == 1)
+	{
+		return @"3G";
+	}
     NSString* RATMode = @"LTE"; 
     NSDictionary *ratState = [self _getRATState:nil];
     int RATSwitchKind = [[ratState objectForKey:@"RATSwitchKind"] intValue]; 
@@ -1378,6 +1537,10 @@ static NSLock *phReloadLock;
 
 %new
 -(BOOL)_RATSwitchAvailable{
+	if (CCSNetworkMode == 1)
+	{
+		return 1;
+	}
     signed int isPhone = 0; 
     int RATSwitchKind; 
     int rtn = 0; 
@@ -1415,6 +1578,10 @@ static NSLock *phReloadLock;
     if (handle != nil) {
         int RATSwitchKind;
         RATSwitchKind = [[[self _getRATState:nil] objectForKey:@"RATSwitchKind"] intValue];
+        if (CCSNetworkMode == 1)
+        {
+        	RATSwitchKind = 1;
+        }
         
         CFStringRef *kCTRegistrationDataRate2G;
         CFStringRef *kCTRegistrationDataRate3G;
@@ -1453,6 +1620,10 @@ static NSLock *phReloadLock;
         CFStringRef tempsecordDataRate; 
         
         RATSwitchKind = [[[self _getRATState:nil] objectForKey:@"RATSwitchKind"] intValue];
+        if (CCSNetworkMode)
+        {
+        	RATSwitchKind = 1;
+        }
         
         CFStringRef *kCTRegistrationDataRate2G;
         CFStringRef *kCTRegistrationDataRate3G;
@@ -1472,6 +1643,10 @@ static NSLock *phReloadLock;
         else if( 2 == RATSwitchKind )
         {
             firstDataRate = kCTRegistrationDataRate3G;
+            if (CCSNetworkMode == 2)
+            {
+            	firstDataRate = kCTRegistrationDataRate2G;
+            }
             secordDataRate = kCTRegistrationDataRate4G;
         }
         
@@ -1837,6 +2012,9 @@ static NSTimer *homeMenuTimer = nil;
 -(void)_delayUpdateKillBackgroundButtonState{
 	[[self _buttonForSetting:21] setUserInteractionEnabled:YES];
 	[[self _buttonForSetting:21] setSelected:NO];
+	if (CCSDismissControlCenterKB || CCSDismissControlCenter){
+		[[objc_getClass("SBControlCenterController") sharedInstance] performSelector:@selector(handleMenuButtonTap) withObject:nil afterDelay:0.8f];
+	}
 }
 
 %new
@@ -1862,7 +2040,7 @@ static NSTimer *homeMenuTimer = nil;
 	int i = 0;
 	int count = 0;
 	NSString *appID = [sliderController _displayIDAtIndex:i];
-	id nowPlayingApplication = [[objc_getClass("SBMediaController") sharedInstance] nowPlayingApplication];
+	id nowPlayingApplication = CCSKillMusic? nil : [[objc_getClass("SBMediaController") sharedInstance] isPlaying] ? [[objc_getClass("SBMediaController") sharedInstance] nowPlayingApplication] : nil;
 	id frontMostApplication = [(SpringBoard*)[UIApplication sharedApplication] _accessibilityFrontMostApplication];
 	while (appID != nil) {
 		if ([appID isEqualToString:@"com.apple.springboard"])
@@ -1873,6 +2051,9 @@ static NSTimer *homeMenuTimer = nil;
 			i++;
 		}
 		else if (frontMostApplication != nil && [appID isEqualToString:[frontMostApplication displayIdentifier]]){
+			i++;
+		}
+		else if ([[whiteList objectForKey:appID] boolValue]) {
 			i++;
 		}
 		else {
@@ -2142,6 +2323,16 @@ static NSTimer *homeMenuTimer = nil;
 	if (orderSetting == nil)
 	{
 		orderSetting = [[NSDictionary alloc] initWithContentsOfFile:@"/Library/Application Support/CCSettings/CCSettingsOrder.plist"];
+	}
+	hideWhenLocked = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.plipala.ccsettings.hidewhenlocked.plist"];
+	if (hideWhenLocked == nil)
+	{
+		hideWhenLocked = [[NSDictionary alloc] init];
+	}
+	whiteList = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.plipala.ccsettings.whitelist.plist"];
+	if (whiteList == nil)
+	{
+		whiteList = [[NSDictionary alloc] init];
 	}
 	void *ctlib = dlopen("/System/Library/Frameworks/CoreTelephony.framework/CoreTelephony", RTLD_LAZY);
     if (ctlib) {

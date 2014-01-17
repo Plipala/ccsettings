@@ -2,3 +2,5 @@
 .theos/obj/
 sshtoggleforccsettings/.theos/_/
 sshtoggleforccsettings/.theos/obj/
+*.deb
+sshtoggleforccsettings/*.deb
