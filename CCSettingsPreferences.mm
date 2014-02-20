@@ -12,6 +12,8 @@ static void _callback(){
     //Do nothing;
 };
 
+NSString * (*SBSCopyLocalizedApplicationNameForDisplayIdentifier)(NSString*);
+
 @interface PSViewController : UIViewController {
 }
 -(id)initForContentSize:(CGSize)size;
@@ -28,28 +30,28 @@ static void _callback(){
 -(NSArray*)loadSpecifiersFromPlistName:(NSString*)plistName target:(id)target;
 @end
 
-@interface CCSettingsAdvSettingViewController : PSListController
+@interface CCSettingsPreferencesListController : PSListController
 @end
 
-@implementation CCSettingsAdvSettingViewController
+@implementation CCSettingsPreferencesListController
 
 - (id)specifiers {
     if(_specifiers == nil) {
-        _specifiers = [[self loadSpecifiersFromPlistName:@"AdvancePreferences" target:self] retain];
+        _specifiers = [[self loadSpecifiersFromPlistName:@"CCSettingsPreferences" target:self] retain];
     }
     return _specifiers;
 }
 
 @end
 
-@interface CCSettingsPreferencesListController: PSViewController <UITableViewDelegate,UITableViewDataSource>{
+@interface CCSettingsSettingsSectionPreferencesController: PSViewController <UITableViewDelegate,UITableViewDataSource>{
     UITableView *_tableView;
     NSMutableDictionary *_settingDataDictionary;
 }
 - (id)initForContentSize:(CGSize)size;
 @end
 
-@implementation CCSettingsPreferencesListController
+@implementation CCSettingsSettingsSectionPreferencesController
 
 - (void)save
 {
@@ -69,21 +71,13 @@ static void _callback(){
     notify_post("com.plipala.ccsettings.orderchanged");
 }
 
--(void)infoButtonAction:(id)sender{
-    CCSettingsAdvSettingViewController *vc = [[CCSettingsAdvSettingViewController alloc] init];
-    [vc setRootController:[self rootController]];
-    [vc setParentController:self];
-    [self pushController:vc];
-    [vc release];
-}
-
 - (id)initForContentSize:(CGSize)size{
     if ( [[PSViewController class] instancesRespondToSelector:@selector( initForContentSize: )] )
         self = [super initForContentSize:size];
     else
         self = [super init];
     if (self) {
-        [[self navigationItem] setTitle:@"CCSettings"];
+        [[self navigationItem] setTitle:[[NSBundle bundleWithIdentifier:@"com.plipala.ccsettingspreferences"] localizedStringForKey:@"Setting Toggles" value:@"" table:@"CCSettingsPreferences"]];
         
         _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0,0,size.width,size.height) style:UITableViewStyleGrouped];
         _tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -91,13 +85,6 @@ static void _callback(){
         _tableView.delegate = self;
         _tableView.dataSource = self;
         _tableView.allowsSelectionDuringEditing = YES;
-
-        UIImage *settingImage = [UIImage imageWithContentsOfFile:[[NSBundle bundleWithIdentifier:@"com.plipala.ccsettingspreferences"] pathForResource:@"settings@2x" ofType:@"png"]];
-        UIBarButtonItem* infoButton = [[UIBarButtonItem alloc] initWithImage:settingImage style:UIBarButtonItemStyleBordered target:self action:@selector(infoButtonAction:)];
-        UIBarButtonItem *negativeSpacer = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
-        negativeSpacer.width = -10;
-        [[self navigationItem] setRightBarButtonItems:[NSArray arrayWithObjects:negativeSpacer,infoButton,nil]];
-        [infoButton release];
         
         NSMutableArray *enabledArray = [NSMutableArray array];
         NSMutableArray *disableArray = [NSMutableArray array];
@@ -434,6 +421,289 @@ static void _callback(){
 
 @end
 
+@interface CCSettingsQuickLaunchSectionPreferencesController: PSViewController <UITableViewDelegate,UITableViewDataSource>{
+    UITableView *_tableView;
+    NSMutableDictionary *_settingDataDictionary;
+}
+- (id)initForContentSize:(CGSize)size;
+@end
+
+@implementation CCSettingsQuickLaunchSectionPreferencesController
+
+- (void)save
+{
+    NSMutableDictionary *_settingResult = [NSMutableDictionary dictionary];
+    NSArray *_enabledArray = [_settingDataDictionary objectForKey:@"Enabled"];
+    for (int i = 0; i < [_enabledArray count]; ++i)
+    {
+        [_settingResult setObject:[NSNumber numberWithInt:i] forKey:[_enabledArray objectAtIndex:i]];
+    }
+    NSArray *_disabledArray = [_settingDataDictionary objectForKey:@"Disabled"];
+    for (NSString *identifier in _disabledArray)
+    {
+        if ([identifier isEqualToString:@"torch"]
+         || [identifier isEqualToString:@"clock"]
+         || [identifier isEqualToString:@"calculator"]
+         || [identifier isEqualToString:@"camera"]
+         || [identifier isEqualToString:@"home"] 
+         || [identifier isEqualToString:@"lock"] 
+         || [identifier isEqualToString:@"screenShot"])
+        {
+            [_settingResult setObject:[NSNumber numberWithInt:-1] forKey:identifier];
+        }
+        
+    }
+    [_settingResult writeToFile:@"/var/mobile/Library/Preferences/com.plipala.ccsettings.quick.plist" atomically:YES];
+
+    notify_post("com.plipala.ccsettings.quick.orderchanged");
+}
+
+- (id)initForContentSize:(CGSize)size{
+    if ( [[PSViewController class] instancesRespondToSelector:@selector( initForContentSize: )] )
+        self = [super initForContentSize:size];
+    else
+        self = [super init];
+    if (self) {
+        SBSCopyLocalizedApplicationNameForDisplayIdentifier = (NSString *(*)(NSString *))dlsym(RTLD_DEFAULT, "SBSCopyLocalizedApplicationNameForDisplayIdentifier");
+        [[self navigationItem] setTitle:[[NSBundle bundleWithIdentifier:@"com.plipala.ccsettingspreferences"] localizedStringForKey:@"Quick launch items" value:@"" table:@"CCSettingsPreferences"]];
+        
+        _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0,0,size.width,size.height) style:UITableViewStyleGrouped];
+        _tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        _tableView.editing = YES;
+        _tableView.delegate = self;
+        _tableView.dataSource = self;
+        _tableView.allowsSelectionDuringEditing = YES;
+        
+        NSMutableArray *enabledArray = [NSMutableArray array];
+        NSMutableArray *disableArray = [NSMutableArray array];
+        
+        NSDictionary *_customlizeOrderDictionary = [NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.plipala.ccsettings.quick.plist"];
+        NSDictionary *_oringinalOrderDictionary = [NSDictionary dictionaryWithContentsOfFile:@"/Library/Application Support/CCSettings/CCSettingsOrderQuick.plist"];
+        
+        NSMutableArray *keys = [NSMutableArray arrayWithArray:[_oringinalOrderDictionary allKeys]];
+
+        NSArray *contains = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:@"/Library/Application Support/CCSettings/QuickLaunch" error:nil];
+        for (NSString *itemFile in contains)
+        {
+            NSString *appId = [itemFile stringByReplacingOccurrencesOfString:@"@2x.png" withString:@""];
+            if (SBSCopyLocalizedApplicationNameForDisplayIdentifier(appId) != nil)
+            {
+                [keys addObject:appId];
+            }
+        }
+        for (NSString *identifier in keys) {
+            if ([_customlizeOrderDictionary objectForKey:identifier] != nil)
+            {
+                if ([[_customlizeOrderDictionary objectForKey:identifier] intValue] >= 0)
+                {
+                    [enabledArray addObject:identifier];
+                }
+                else {
+                    [disableArray addObject:identifier];
+                }
+            }
+            else if ([_oringinalOrderDictionary objectForKey:identifier] != nil && [[_oringinalOrderDictionary objectForKey:identifier] intValue]>= 0)
+            {
+                [enabledArray addObject:identifier];
+            }
+            else {
+                [disableArray addObject:identifier];
+            }
+        }
+        
+        [enabledArray sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+            if ([_customlizeOrderDictionary objectForKey:obj1] != nil)
+            {
+                if ([_customlizeOrderDictionary objectForKey:obj2] != nil)
+                {
+                    return [[_customlizeOrderDictionary objectForKey:obj1] compare:[_customlizeOrderDictionary objectForKey:obj2]];
+                }
+                else {
+                    return NSOrderedAscending;
+                }
+            }
+            else {
+                if ([_customlizeOrderDictionary objectForKey:obj2] != nil)
+                {
+                    return NSOrderedDescending;
+                }
+                else {
+                    return [[_oringinalOrderDictionary objectForKey:obj1] compare:[_oringinalOrderDictionary objectForKey:obj2]];
+                }
+            }
+        }];
+        _settingDataDictionary = [[NSMutableDictionary alloc] initWithObjectsAndKeys:enabledArray,@"Enabled",disableArray,@"Disabled",nil];
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    [_settingDataDictionary release];
+    [_tableView release];
+    [super dealloc];
+}
+
+-(void)viewDidLoad{
+    self.navigationController.navigationBar.translucent = NO;
+    if ([self respondsToSelector:@selector(edgesForExtendedLayout)])
+        self.edgesForExtendedLayout = UIRectEdgeNone;
+}
+
+- (UIView*)view
+{
+    return _tableView;
+}
+
+- (id)table{
+    return nil;
+}
+
+#pragma mark - UITableViewDelegate
+
+- (void)tableView:(UITableView*)tableView didSelectRowAtIndexPath:(NSIndexPath*)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (UITableViewCellEditingStyle)tableView:(UITableView*)tableView editingStyleForRowAtIndexPath:(NSIndexPath*)indexPath
+{
+    return UITableViewCellEditingStyleNone;
+}
+
+#pragma mark - UITableViewDataSource
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView*)tableView
+{
+    return 2;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
+    if (section == 0)
+    {
+        return [[NSBundle bundleWithIdentifier:@"com.plipala.ccsettingspreferences"] localizedStringForKey:@"Enabled" value:@"" table:nil];
+    }
+    else if (section == 1){
+        return [[NSBundle bundleWithIdentifier:@"com.plipala.ccsettingspreferences"] localizedStringForKey:@"Disabled" value:@"" table:nil];
+    }
+    return @"";
+}
+
+- (NSInteger)tableView:(UITableView*)tableView numberOfRowsInSection:(NSInteger)section
+{
+    if (section == 0) {
+        return [[_settingDataDictionary objectForKey:@"Enabled"] count];
+    }
+    else if (section == 1){
+        return [[_settingDataDictionary objectForKey:@"Disabled"] count];
+    }
+    return 0;
+}
+
+- (BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath{
+    return NO;
+}
+
+- (UITableViewCell*)tableView:(UITableView*)tableView cellForRowAtIndexPath:(NSIndexPath*)indexPath
+{
+    static NSString* cellIdentifier = @"CCSettingsPreferencesViewControllerCell";
+    UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    if ( !cell )
+    {
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier] autorelease];
+    }
+    
+    NSString *identifier = nil;
+    if (indexPath.section == 0) {
+        identifier = [[_settingDataDictionary objectForKey:@"Enabled"] objectAtIndex:indexPath.row];
+        if ([identifier isEqualToString:@"torch"]
+         || [identifier isEqualToString:@"clock"]
+         || [identifier isEqualToString:@"calculator"]
+         || [identifier isEqualToString:@"camera"]
+         || [identifier isEqualToString:@"home"] 
+         || [identifier isEqualToString:@"lock"] 
+         || [identifier isEqualToString:@"screenShot"])
+        {
+            cell.textLabel.text = [[NSBundle bundleWithIdentifier:@"com.plipala.ccsettingspreferences"] localizedStringForKey:identifier value:@"" table:nil];
+        }
+        else {
+            cell.textLabel.text = SBSCopyLocalizedApplicationNameForDisplayIdentifier(identifier);
+        }
+        
+    }
+    else if (indexPath.section == 1) {
+        identifier = [[_settingDataDictionary objectForKey:@"Disabled"] objectAtIndex:indexPath.row];
+        if ([identifier isEqualToString:@"torch"]
+         || [identifier isEqualToString:@"clock"]
+         || [identifier isEqualToString:@"calculator"]
+         || [identifier isEqualToString:@"camera"]
+         || [identifier isEqualToString:@"home"] 
+         || [identifier isEqualToString:@"lock"] 
+         || [identifier isEqualToString:@"screenShot"])
+        {
+            cell.textLabel.text = [[NSBundle bundleWithIdentifier:@"com.plipala.ccsettingspreferences"] localizedStringForKey:identifier value:@"" table:nil];
+        }
+        else {
+            cell.textLabel.text = SBSCopyLocalizedApplicationNameForDisplayIdentifier(identifier);
+        }
+    }
+    else {
+        cell.textLabel.text = @"";
+        identifier = nil;
+    }
+
+
+    // if (identifier != nil)
+    // {
+    //     UIImage *cellImage = [UIImage imageWithContentsOfFile:[[NSBundle bundleWithIdentifier:@"com.plipala.ccsettingspreferences"] pathForResource:[NSString stringWithFormat:@"%@@2x",identifier] ofType:@"png"]];
+    //     cell.imageView.image = cellImage;
+    // }
+    // else {
+    //     cell.imageView.image = nil;
+    // }
+    
+    return cell;
+}
+
+- (BOOL)tableView:(UITableView*)tableView canMoveRowAtIndexPath:(NSIndexPath*)indexPath
+{
+    return YES;
+}
+
+- (void)tableView:(UITableView*)tableView moveRowAtIndexPath:(NSIndexPath*)fromIndexPath toIndexPath:(NSIndexPath*)toIndexPath
+{
+    if (![fromIndexPath compare:toIndexPath])
+    {
+        return;
+    }
+    
+    NSString *orig = nil;
+    if ([fromIndexPath section] == 0) {
+        orig = [[[_settingDataDictionary objectForKey:@"Enabled"] objectAtIndex:[fromIndexPath row]] retain];
+        [[_settingDataDictionary objectForKey:@"Enabled"] removeObjectAtIndex:[fromIndexPath row]];
+    }
+    else if ([fromIndexPath section] == 1){
+        orig = [[[_settingDataDictionary objectForKey:@"Disabled"] objectAtIndex:[fromIndexPath row]] retain];
+        [[_settingDataDictionary objectForKey:@"Disabled"] removeObjectAtIndex:[fromIndexPath row]];
+    }
+    if (orig != nil) {
+        if ([toIndexPath section] == 0) {
+            [[_settingDataDictionary objectForKey:@"Enabled"] insertObject:orig atIndex:[toIndexPath row]];
+        }
+        else if ([toIndexPath section] == 1){
+            [[_settingDataDictionary objectForKey:@"Disabled"] insertObject:orig atIndex:[toIndexPath row]];
+        }
+        [orig release];
+    }
+    [self save];
+}
+
+-(void)viewWillDisappear:(BOOL)animated{
+    [self save];
+}
+
+@end
+
 @interface CCSettingsPreferencesHideWhenLockedListController: PSViewController <UITableViewDelegate,UITableViewDataSource>{
     UITableView *_tableView;
     NSMutableArray *_togglesArray;
@@ -456,7 +726,7 @@ static void _callback(){
     else
         self = [super init];
     if (self) {
-        [[self navigationItem] setTitle:[[NSBundle bundleWithIdentifier:@"com.plipala.ccsettingspreferences"] localizedStringForKey:@"Hide when locked" value:@"" table:@"AdvancePreferences"]];
+        [[self navigationItem] setTitle:[[NSBundle bundleWithIdentifier:@"com.plipala.ccsettingspreferences"] localizedStringForKey:@"Hide when locked" value:@"" table:@"CCSettingsPreferences"]];
         
         _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0,0,size.width,size.height) style:UITableViewStyleGrouped];
         _tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -745,8 +1015,6 @@ static void _callback(){
 
 @end
 
-NSString * (*SBSCopyLocalizedApplicationNameForDisplayIdentifier)(NSString*);
-
 @interface CCSettingsWhiteListController: PSViewController <UITableViewDelegate,UITableViewDataSource,UIAlertViewDelegate>{
     UITableView *_tableView;
     NSMutableDictionary *_settingDataDictionary;
@@ -778,9 +1046,8 @@ NSString * (*SBSCopyLocalizedApplicationNameForDisplayIdentifier)(NSString*);
     else
         self = [super init];
     if (self) {
-
         SBSCopyLocalizedApplicationNameForDisplayIdentifier = (NSString *(*)(NSString *))dlsym(RTLD_DEFAULT, "SBSCopyLocalizedApplicationNameForDisplayIdentifier");
-        [[self navigationItem] setTitle:[[NSBundle bundleWithIdentifier:@"com.plipala.ccsettingspreferences"] localizedStringForKey:@"White list" value:@"" table:@"AdvancePreferences"]];
+        [[self navigationItem] setTitle:[[NSBundle bundleWithIdentifier:@"com.plipala.ccsettingspreferences"] localizedStringForKey:@"White list" value:@"" table:@"CCSettingsPreferences"]];
         
         _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0,0,size.width,size.height) style:UITableViewStyleGrouped];
         _tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;

@@ -51,14 +51,17 @@ static void _callback(){
 
 static NSBundle *localBundle = nil;
 static NSDictionary *orderSetting = nil;
+static NSDictionary *orderQuickSetting = nil;
 static int CCSTogglePerLine = 5;
 static BOOL CCSDismissControlCenter = NO;
 static int CCSNetworkMode = 0;
 static BOOL CCSKillMusic = NO;
 static BOOL CCSDismissControlCenterKB = NO;
+static int CCSQLClockType = 3;
 static NSDictionary *hideWhenLocked = nil;
 static BOOL lastLockStatus = YES;
 static NSDictionary *whiteList = nil;
+
 
 @interface UIView (Private)
 -(BOOL)_shouldAnimatePropertyWithKey:(id)key;
@@ -66,6 +69,7 @@ static NSDictionary *whiteList = nil;
 
 @interface SBControlCenterButton
 +(id)circularButtonWithGlyphImage:(UIImage*)image;
++(id)roundRectButtonWithGlyphImage:(id)arg1;
 @property(copy, nonatomic) NSString* identifier;
 @property(copy, nonatomic) NSNumber* sortKey;
 @property(nonatomic,assign) id delegate;
@@ -271,12 +275,17 @@ static void CCSettingsSetDismissLockStatus(NSInteger loading) {
 }
 
 -(void)layoutSubviews{
+	float fixWidth = 16.0f;
+	if (CCSTogglePerLine == 6)
+	{
+		fixWidth = 6.0f;
+	}
 	if ([_buttons count] > 0)
 	{
 		if (self.frame.size.width > self.frame.size.height)
 		{
 			CGSize _buttonSize = ((UIView*)[_buttons objectAtIndex:0]).frame.size;
-			float _buttonPending = (self.frame.size.width - 32 - _buttonSize.width * CCSTogglePerLine - _contentEdgeInsets.left - _contentEdgeInsets.right) / (CCSTogglePerLine - 1);
+			float _buttonPending = (self.frame.size.width - fixWidth * 2 - _buttonSize.width * CCSTogglePerLine - _contentEdgeInsets.left - _contentEdgeInsets.right) / (CCSTogglePerLine - 1);
 			float _buttonTop = round((self.frame.size.height) - _contentEdgeInsets.top - _contentEdgeInsets.bottom - _buttonSize.height) / 2.0f;
 
 			for (int i = 0; i < [_buttons count]; ++i)
@@ -284,7 +293,7 @@ static void CCSettingsSetDismissLockStatus(NSInteger loading) {
 				UIView *button = [_buttons objectAtIndex:i];
 				int _page = i / CCSTogglePerLine;
 				int _loc = i % CCSTogglePerLine;
-				int _buttonOrigX = round((16 + _contentEdgeInsets.left + _buttonSize.width * _loc +  _buttonPending * _loc + self.frame.size.width * _page) * 2) / 2.0f;
+				int _buttonOrigX = round((fixWidth + _contentEdgeInsets.left + _buttonSize.width * _loc +  _buttonPending * _loc + self.frame.size.width * _page) * 2) / 2.0f;
 				button.frame = CGRectMake(_buttonOrigX, _buttonTop, button.frame.size.width, button.frame.size.height);
 			}
 			int _totalPage = [_buttons count] / CCSTogglePerLine + (([_buttons count] % CCSTogglePerLine > 0)?1:0);
@@ -292,7 +301,7 @@ static void CCSettingsSetDismissLockStatus(NSInteger loading) {
 		}
 		else {
 			CGSize _buttonSize = ((UIView*)[_buttons objectAtIndex:0]).frame.size;
-			float _buttonPending = (self.frame.size.height - 32 - _buttonSize.height * CCSTogglePerLine - _contentEdgeInsets.top - _contentEdgeInsets.bottom) / (CCSTogglePerLine -1);
+			float _buttonPending = (self.frame.size.height - fixWidth * 2 - _buttonSize.height * CCSTogglePerLine - _contentEdgeInsets.top - _contentEdgeInsets.bottom) / (CCSTogglePerLine -1);
 			float _buttonLeft = round((self.frame.size.width) - _contentEdgeInsets.left - _contentEdgeInsets.right - _buttonSize.width) / 2.0f;
 
 			for (int i = 0; i < [_buttons count]; ++i)
@@ -300,7 +309,7 @@ static void CCSettingsSetDismissLockStatus(NSInteger loading) {
 				UIView *button = [_buttons objectAtIndex:i];
 				int _page = i / CCSTogglePerLine;
 				int _loc = i % CCSTogglePerLine;
-				int _buttonOrigY = round((16 + _contentEdgeInsets.top + _buttonSize.height * _loc +  _buttonPending * _loc + self.frame.size.height * _page) * 2) / 2.0f;
+				int _buttonOrigY = round((fixWidth + _contentEdgeInsets.top + _buttonSize.height * _loc +  _buttonPending * _loc + self.frame.size.height * _page) * 2) / 2.0f;
 				button.frame = CGRectMake(_buttonLeft, _buttonOrigY, button.frame.size.width, button.frame.size.height);
 			}
 			int _totalPage = ([_buttons count] - 1) / CCSTogglePerLine + ((([_buttons count] - 1) % CCSTogglePerLine > 0)?1:0);
@@ -309,6 +318,53 @@ static void CCSettingsSetDismissLockStatus(NSInteger loading) {
 	}
 
 	[super layoutSubviews];
+}
+
+@end
+
+@interface SBCCButtonLayoutScrollViewForQuickSection : SBCCButtonLayoutScrollView
+@end
+
+@implementation SBCCButtonLayoutScrollViewForQuickSection
+
+-(void)layoutSubviews{
+	float fixWidth = 16.0f;
+	if ([_buttons count] > 0)
+	{
+		if (self.frame.size.width > self.frame.size.height)
+		{
+			CGSize _buttonSize = ((UIView*)[_buttons objectAtIndex:0]).frame.size;
+			float _buttonPending = (self.frame.size.width - fixWidth * 2 - _buttonSize.width * 4 - _contentEdgeInsets.left - _contentEdgeInsets.right) / (4 - 1);
+			float _buttonTop = round((self.frame.size.height) - _contentEdgeInsets.top - _contentEdgeInsets.bottom - _buttonSize.height) / 2.0f;
+
+			for (int i = 0; i < [_buttons count]; ++i)
+			{
+				UIView *button = [_buttons objectAtIndex:i];
+				int _page = i / 4;
+				int _loc = i % 4;
+				int _buttonOrigX = round((fixWidth + _contentEdgeInsets.left + _buttonSize.width * _loc +  _buttonPending * _loc + self.frame.size.width * _page) * 2) / 2.0f;
+				button.frame = CGRectMake(_buttonOrigX, _buttonTop, button.frame.size.width, button.frame.size.height);
+			}
+			int _totalPage = [_buttons count] / 4 + (([_buttons count] % 4 > 0)?1:0);
+			[_layview setContentSize:CGSizeMake(_layview.frame.size.width * _totalPage, _layview.frame.size.height)];
+		}
+		else {
+			CGSize _buttonSize = ((UIView*)[_buttons objectAtIndex:0]).frame.size;
+			float _buttonPending = (self.frame.size.height - fixWidth * 2 - _buttonSize.height * 4 - _contentEdgeInsets.top - _contentEdgeInsets.bottom) / (4 -1);
+			float _buttonLeft = round((self.frame.size.width) - _contentEdgeInsets.left - _contentEdgeInsets.right - _buttonSize.width) / 2.0f;
+
+			for (int i = 0; i < [_buttons count]; ++i)
+			{
+				UIView *button = [_buttons objectAtIndex:i];
+				int _page = i / 4;
+				int _loc = i % 4;
+				int _buttonOrigY = round((fixWidth + _contentEdgeInsets.top + _buttonSize.height * _loc +  _buttonPending * _loc + self.frame.size.height * _page) * 2) / 2.0f;
+				button.frame = CGRectMake(_buttonLeft, _buttonOrigY, button.frame.size.width, button.frame.size.height);
+			}
+			int _totalPage = ([_buttons count] - 1) / 4 + ((([_buttons count] - 1) % 4 > 0)?1:0);
+			[_layview setContentSize:CGSizeMake(_layview.frame.size.width , _layview.frame.size.height * _totalPage)];
+		}
+	}
 }
 
 @end
@@ -408,6 +464,20 @@ static void CCSettingsSetDismissLockStatus(NSInteger loading) {
 
 @end
 
+@interface SBCCQuickLaunchSectionController
+
+-(id)view;
+-(void)_activateAppWithBundleId:(id)bundleId url:(id)url;
+-(id)_bundleIDForButton:(id)button;
+
+-(NSNumber *)_orderForIdentifier:(NSString *)identifier;
+-(void)_setHome;
+-(void)_setLock;
+-(void)_setScreenShot;
+-(void)_reloadButtons;
+
+@end
+
 @interface SBCCButtonLayoutView 
 -(void)addButton:(id)button;
 @end
@@ -465,7 +535,7 @@ typedef enum PSCellType {
 @end
 
 @interface SBScreenShotter
--(void)saveScreenshot:(BOOL)screenshot;
+-(void)saveScreenshot:(BOOL)screenShot;
 +(id)sharedInstance;
 @end
 
@@ -482,6 +552,12 @@ typedef enum PSCellType {
 
 @interface SBIconModel
 -(id)leafIcons;
+@end
+
+@interface SBAssistantController
++(id)sharedInstance;
+-(void)dismissAssistantViewIfNecessary:(int)necessary;
+-(void)_activateSiriForPPT;
 @end
 
 static void dataCallback(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)   
@@ -561,6 +637,21 @@ static void ccsettingsOrderChanged(CFNotificationCenterRef center, void *observe
 	[(SBCCSettingsSectionController*)observer _reloadButtons];
 }
 
+/*
+static void ccsettingsQuickOrderChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
+{
+	@synchronized(orderQuickSetting) {
+		[orderQuickSetting release];
+		orderQuickSetting = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.plipala.ccsettings.quick.plist"];
+		if (orderQuickSetting == nil)
+		{
+			orderQuickSetting = [[NSDictionary alloc] initWithContentsOfFile:@"/Library/Application Support/CCSettings/CCSettingsOrderQuick.plist"];
+		}
+	}
+	[(SBCCQuickLaunchSectionController*)observer _reloadButtons];
+}
+*/
+
 static void ccsettingsPreferencesChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
 {
 	NSDictionary *settings = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.plipala.ccsettings.preferences.plist"];
@@ -615,6 +706,10 @@ static void ccsettingsPreferencesChanged(CFNotificationCenterRef center, void *o
 		if ([settings objectForKey:@"DISMISS_CONTROL_CENTER_KB"])
 		{
 			CCSDismissControlCenterKB = [[settings objectForKey:@"DISMISS_CONTROL_CENTER_KB"] boolValue];
+		}
+		if ([settings objectForKey:@"CLOCK_TYPE"])
+		{
+			CCSQLClockType = [[settings objectForKey:@"CLOCK_TYPE"] intValue];
 		}
 	}
 }
@@ -740,6 +835,10 @@ static void ccsettingsWhiteListChanged(CFNotificationCenterRef center, void *obs
     	if (setting != 1 || !objc_getClass("WiPiListener")) {
     		UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
     		longPress.minimumPressDuration = 0.5f;
+    		if (setting == 16)
+    		{
+    			longPress.minimumPressDuration = 2.0f;
+    		}
     		[(UIView*)button addGestureRecognizer:longPress];
     		[longPress release];
     	}
@@ -1087,6 +1186,9 @@ static void ccsettingsWhiteListChanged(CFNotificationCenterRef center, void *obs
         case 7:
         	[(SpringBoard*)[UIApplication sharedApplication] applicationOpenURL:[NSURL URLWithString:@"prefs:root=LOCATION_SERVICES"] publicURLsOnly:NO];
             break;
+        case 16:
+        	[[objc_getClass("SBAssistantController") sharedInstance] _activateSiriForPPT];
+        	break;
         case 17:
         	[(SpringBoard*)[UIApplication sharedApplication] applicationOpenURL:[NSURL URLWithString:@"prefs:root=General&path=VPN"] publicURLsOnly:NO];
             break;
@@ -1145,6 +1247,7 @@ static void ccsettingsWhiteListChanged(CFNotificationCenterRef center, void *obs
 	{
 		[self _updateFluxButtonState];
 	}
+	[self _updateDataButtonState];
 
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), self, &ccsettingsOrderChanged, CFSTR("com.plipala.ccsettings.orderchanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), self, &ccsettingsPreferencesChanged, CFSTR("com.plipala.ccsettings.preferencesChanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
@@ -1201,6 +1304,10 @@ static void ccsettingsWhiteListChanged(CFNotificationCenterRef center, void *obs
 		if ([settings objectForKey:@"DISMISS_CONTROL_CENTER_KB"])
 		{
 			CCSDismissControlCenterKB = [[settings objectForKey:@"DISMISS_CONTROL_CENTER_KB"] boolValue];
+		}
+		if ([settings objectForKey:@"CLOCK_TYPE"])
+		{
+			CCSQLClockType = [[settings objectForKey:@"CLOCK_TYPE"] intValue];
 		}
 	}
 }
@@ -2316,6 +2423,291 @@ static NSTimer *homeMenuTimer = nil;
 
 %end
 
+/*
+static id _homeButton = nil;
+static id _lockButton = nil;
+static id _screenShotButton = nil;
+static NSMutableArray *_buttonIdentifiers = nil;
+
+%hook SBCCQuickLaunchSectionController
+
+%new
+-(NSNumber *)_orderForIdentifier:(NSString *)identifier{
+	if ([orderQuickSetting objectForKey:identifier])
+	{
+		return [NSNumber numberWithInteger:[[orderQuickSetting objectForKey:identifier] intValue]];
+	}
+	else {
+		return [NSNumber numberWithInteger:-1];
+	}
+}
+
+%new
+-(void)_reloadButtons{
+	[[self view] removeAllButtons];
+	for (NSString *identifier in [orderQuickSetting allKeys]){
+		id theButton = nil;
+		if ([identifier isEqualToString:@"torch"])
+		{
+			theButton = [(id)self valueForKey:@"_torchButton"];
+		}
+		else if ([identifier isEqualToString:@"clock"])
+		{
+			theButton = [(id)self valueForKey:@"_clockButton"];
+		}
+		else if ([identifier isEqualToString:@"calculator"])
+		{
+			theButton = [(id)self valueForKey:@"_calculatorButton"];
+		}
+		else if ([identifier isEqualToString:@"camera"])
+		{
+			theButton = [(id)self valueForKey:@"_cameraButton"];
+		}
+		else if ([identifier isEqualToString:@"home"]) {
+			theButton = _homeButton;
+		}
+		else if ([identifier isEqualToString:@"lock"]) {
+			theButton = _lockButton;
+		}
+		else if ([identifier isEqualToString:@"screenShot"]) {
+			theButton = _screenShotButton;
+		}
+		else {
+			UIImage *buttonImage = [UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"/Library/Application Support/CCSettings/QuickLaunch/%@@2x.png",identifier]];
+			theButton = [objc_getClass("SBControlCenterButton") roundRectButtonWithGlyphImage:buttonImage];
+			[theButton setDelegate:self];
+			[(UIButton*)theButton setSelected:NO];
+			[(UIButton*)theButton setTag:[_buttonIdentifiers count] + 1];
+			[_buttonIdentifiers addObject:identifier];
+			NSMutableArray* __buttons =  (NSMutableArray*)[(id)self valueForKey:@"_buttons"];
+			[__buttons addObject:theButton];
+		}
+		if (theButton != nil)
+		{
+			NSNumber *order = [self _orderForIdentifier:identifier];
+			if ([order intValue] < 0)
+			{
+				[[self view] removeButton:theButton];
+			}
+			else {
+				[theButton setSortKey:order];
+				[(id)[self view] addButton:theButton];
+			}
+		}
+	}
+}
+
+-(id)init{
+	id res = %orig;
+	_buttonIdentifiers = [[NSMutableArray alloc] init];
+	return res;
+}
+
+-(void)dealloc{
+	[_buttonIdentifiers release];
+	%orig;
+}
+
+-(void)viewDidLoad{
+	%orig;
+	for (NSString *identifier in [orderQuickSetting allKeys]){
+		id theButton = nil;
+		if ([identifier isEqualToString:@"torch"])
+		{
+			theButton = [(id)self valueForKey:@"_torchButton"];
+		}
+		else if ([identifier isEqualToString:@"clock"])
+		{
+			theButton = [(id)self valueForKey:@"_clockButton"];
+		}
+		else if ([identifier isEqualToString:@"calculator"])
+		{
+			theButton = [(id)self valueForKey:@"_calculatorButton"];
+		}
+		else if ([identifier isEqualToString:@"camera"])
+		{
+			theButton = [(id)self valueForKey:@"_cameraButton"];
+		}
+		else if ([identifier isEqualToString:@"home"]) {
+			UIImage *buttonImage = [UIImage imageWithContentsOfFile:@"/Library/Application Support/CCSettings/ControlCenterGlyphQuickHome.png"];
+			_homeButton = [objc_getClass("SBControlCenterButton") roundRectButtonWithGlyphImage:buttonImage];
+			[_homeButton setDelegate:self];
+			[(UIButton*)_homeButton setSelected:NO];
+			NSMutableArray* __buttons =  (NSMutableArray*)[(id)self valueForKey:@"_buttons"];
+			[__buttons addObject:_homeButton];
+			theButton = _homeButton;
+		}
+		else if ([identifier isEqualToString:@"lock"]) {
+			UIImage *buttonImage = [UIImage imageWithContentsOfFile:@"/Library/Application Support/CCSettings/ControlCenterGlyphQuickLock.png"];
+			_lockButton = [objc_getClass("SBControlCenterButton") roundRectButtonWithGlyphImage:buttonImage];
+			[_lockButton setDelegate:self];
+			[(UIButton*)_lockButton setSelected:NO];
+			NSMutableArray* __buttons =  (NSMutableArray*)[(id)self valueForKey:@"_buttons"];
+			[__buttons addObject:_lockButton];
+			theButton = _lockButton;
+		}
+		else if ([identifier isEqualToString:@"screenShot"]) {
+			UIImage *buttonImage = [UIImage imageWithContentsOfFile:@"/Library/Application Support/CCSettings/ControlCenterGlyphQuickScreenShot.png"];
+			_screenShotButton = [objc_getClass("SBControlCenterButton") roundRectButtonWithGlyphImage:buttonImage];
+			[_screenShotButton setDelegate:self];
+			[(UIButton*)_screenShotButton setSelected:NO];
+			NSMutableArray* __buttons =  (NSMutableArray*)[(id)self valueForKey:@"_buttons"];
+			[__buttons addObject:_screenShotButton];
+			theButton = _screenShotButton;
+		}
+		else {
+			UIImage *buttonImage = [UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"/Library/Application Support/CCSettings/QuickLaunch/%@@2x.png",identifier]];
+			theButton = [objc_getClass("SBControlCenterButton") roundRectButtonWithGlyphImage:buttonImage];
+			[theButton setDelegate:self];
+			[(UIButton*)theButton setSelected:NO];
+			[(UIButton*)theButton setTag:[_buttonIdentifiers count] + 1];
+			[_buttonIdentifiers addObject:identifier];
+			NSMutableArray* __buttons =  (NSMutableArray*)[(id)self valueForKey:@"_buttons"];
+			[__buttons addObject:theButton];
+		}
+		if (theButton != nil)
+		{
+			NSNumber *order = [self _orderForIdentifier:identifier];
+			if ([order intValue] < 0)
+			{
+				[[self view] removeButton:theButton];
+			}
+			else {
+				[theButton setSortKey:order];
+				[(id)[self view] addButton:theButton];
+			}
+		}
+	}
+	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), self, &ccsettingsQuickOrderChanged, CFSTR("com.plipala.ccsettings.quick.orderchanged"), NULL, CFNotificationSuspensionBehaviorCoalesce);
+}
+
+-(void)buttonTapped:(id)tapped{
+	if (tapped == [(id)self valueForKey:@"_torchButton"] || tapped == [(id)self valueForKey:@"_clockButton"] || tapped == [(id)self valueForKey:@"_calculatorButton"] || tapped == [(id)self valueForKey:@"_cameraButton"])
+	{
+		%orig;
+	}
+	else if (tapped == _homeButton)
+	{
+		[self _setHome];
+	}
+	else if (tapped == _lockButton) {
+		[self _setLock];
+	}
+	else if (tapped == _screenShotButton) {
+		[self _setScreenShot];
+	}
+	else {
+		%orig;
+	}
+}
+
+-(id)_urlForButton:(id)button{
+	if (button == [(id)self valueForKey:@"_clockButton"])
+	{
+		if (CCSQLClockType == 0)
+		{
+			return [NSURL URLWithString:@"clock-worldclock:default"];
+		}
+		else if (CCSQLClockType == 1)
+		{
+			return [NSURL URLWithString:@"clock-alarm:default"];
+		}
+		else if (CCSQLClockType == 2)
+		{
+			return [NSURL URLWithString:@"clock-stopwatch:default"];
+		}
+		else {
+			return %orig;
+		}
+	}
+	else if (button == [(id)self valueForKey:@"_torchButton"] || button == [(id)self valueForKey:@"_calculatorButton"] || button == [(id)self valueForKey:@"_cameraButton"])
+	{
+		return %orig;
+	}
+	else {
+		return NULL;
+	}
+}
+
+-(id)_bundleIDForButton:(id)button{
+	if (button == [(id)self valueForKey:@"_torchButton"] || button == [(id)self valueForKey:@"_clockButton"] || button == [(id)self valueForKey:@"_calculatorButton"] || button == [(id)self valueForKey:@"_cameraButton"])
+	{
+		return %orig;
+	}
+	else {
+		int index = [button tag] - 1;
+		if (index < 0 && index >= [_buttonIdentifiers count])
+		{
+			return nil;
+		}
+		return [_buttonIdentifiers objectAtIndex:index];
+	}
+}
+
++(id)viewClass{
+	return objc_getClass("SBCCButtonLayoutScrollViewForQuickSection");
+}
+
+-(void)viewWillAppear:(BOOL)view{
+	[(UIScrollView*)[[self view] valueForKey:@"_layview"] setContentOffset:CGPointMake(0,0) animated:NO];
+}
+
+%new
+-(void)_delayHome{
+	[homeMenuLock lock];
+	if(homeMenuTimer != nil) {
+		[homeMenuTimer release];
+    	homeMenuTimer = nil;		
+	}
+	[homeMenuLock unlock];
+	[_homeButton setSelected:NO];
+	[[objc_getClass("SBUIController") sharedInstance] clickedMenuButton];
+	[[objc_getClass("SBControlCenterController") sharedInstance] handleMenuButtonTap];
+}
+
+%new
+-(void)_setHome{
+	if (homeMenuLock == nil)
+	{
+    	homeMenuLock = [[NSLock alloc] init];
+	}
+	if (homeMenuTimer == nil) {
+        homeMenuTimer = [[NSTimer scheduledTimerWithTimeInterval:0.3f target:self selector:@selector(_delayHome) userInfo:nil repeats:NO] retain];
+    }
+    else{
+        [homeMenuLock lock];
+        if (homeMenuTimer != nil) {
+            [homeMenuTimer invalidate];
+            [homeMenuTimer release];
+            homeMenuTimer = nil;		
+        }
+        [homeMenuLock unlock];
+        [[objc_getClass("SBUIController") sharedInstance] handleMenuDoubleTap];
+        [_homeButton setSelected:NO];
+    }
+}
+
+%new
+-(void)_setLock{
+   	[(SpringBoard*)[UIApplication sharedApplication] _lockButtonUpFromSource:1];
+	[_lockButton setSelected:NO];
+}
+
+%new
+-(void)_delayScreenShot{
+	[[objc_getClass("SBScreenShotter") sharedInstance] saveScreenshot:YES];
+	[_screenShotButton setSelected:NO];
+}
+
+%new
+-(void)_setScreenShot{
+	[[objc_getClass("SBControlCenterController") sharedInstance] handleMenuButtonTap];
+	[(id)self performSelector:@selector(_delayScreenShot) withObject:nil afterDelay:0.5f];
+}
+
+%end
+*/
+
 %ctor{
 	%init();
 	localBundle = [[NSBundle alloc] initWithPath:@"/Library/Application Support/CCSettings/Localized.bundle"];
@@ -2324,6 +2716,13 @@ static NSTimer *homeMenuTimer = nil;
 	{
 		orderSetting = [[NSDictionary alloc] initWithContentsOfFile:@"/Library/Application Support/CCSettings/CCSettingsOrder.plist"];
 	}
+
+	orderQuickSetting = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.plipala.ccsettings.quick.plist"];
+	if (orderQuickSetting == nil)
+	{
+		orderQuickSetting = [[NSDictionary alloc] initWithContentsOfFile:@"/Library/Application Support/CCSettings/CCSettingsOrderQuick.plist"];
+	}
+
 	hideWhenLocked = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.plipala.ccsettings.hidewhenlocked.plist"];
 	if (hideWhenLocked == nil)
 	{

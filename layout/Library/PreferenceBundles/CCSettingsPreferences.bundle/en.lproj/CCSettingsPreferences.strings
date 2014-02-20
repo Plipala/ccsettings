@@ -3,13 +3,14 @@
 "Toggles per line"="Toggles per line";
 "Dismiss control center"="Dismiss control center";
 "Hide when locked"="Hide when locked";
-"3G/4G/LTE"="3G/4G/LTE";
-"Data rate"="Data rate";
+"Quick Launch Section"="Quick Launch Section";
+"Quick launch items"="Quick launch items";
+"Clock type"="Clock type";
 "Kill Background"="Kill Background";
 "Kill music"="Kill music";
 "White list"="White list";
-"Change data rate may cause network problem."="Change data rate may cause network problem.";
 
-"Auto"="Auto";
-"Force 3G"="Force 3G";
-"Switch to 2G when disable 4G"="Switch to 2G when disable 4G";
+"World clock"="World clock";
+"Alert"="Alert";
+"Stopwatch"="Stopwatch";
+"Timer"="Timer";

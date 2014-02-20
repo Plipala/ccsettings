@@ -8,7 +8,15 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>General</string>
+			<string>Settings Section</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>label</key>
+			<string>Setting Toggles</string>
+			<key>detail</key>
+			<string>CCSettingsSettingsSectionPreferencesController</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -64,42 +72,6 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>3G/4G/LTE</string>
-			<key>footerText</key>
-			<string>Change data rate may cause network problem.</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSLinkListCell</string>
-			<key>label</key>
-			<string>Data rate</string>
-			<key>detail</key>
-			<string>PSListItemsController</string>
-			<key>default</key>
-			<integer>0</integer>
-			<key>key</key>
-			<string>NETWORK_MODE</string>
-			<key>defaults</key>
-			<string>com.plipala.ccsettings.preferences</string>
-			<key>PostNotification</key>
-			<string>com.plipala.ccsettings.preferencesChanged</string>
-			<key>validTitles</key>
-			<array>
-				<string>Auto</string>
-				<string>Force 3G</string>
-				<string>Switch to 2G when disable 4G</string>
-			</array>
-			<key>validValues</key>
-			<array>
-				<integer>0</integer>
-				<integer>1</integer>
-				<integer>2</integer>
-			</array>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>label</key>
 			<string>Kill Background</string>
 		</dict>
 		<dict>
@@ -140,6 +112,6 @@
 		</dict>
 	</array>
 	<key>title</key>
-	<string>Advance</string>
+	<string>CCSettings</string>
 </dict>
 </plist>

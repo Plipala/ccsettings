@@ -1,0 +1,17 @@
+"CCSettings"="CCSettings";
+"Settings Section"="设置";
+"Setting Toggles"="开关设置";
+"Toggles per line"="每行开关";
+"Dismiss control center"="自动关闭控制中心";
+"Hide when locked"="锁屏时隐藏";
+"Quick Launch Section"="快捷启动";
+"Quick launch items"="快捷启动设置";
+"Clock type"="时钟类型";
+"Kill Background"="清理后台";
+"Kill music"="清理音乐应用";
+"White list"="白名单";
+
+"World clock"="世界时钟";
+"Alert"="闹钟";
+"Stopwatch"="秒表";
+"Timer"="计时器";

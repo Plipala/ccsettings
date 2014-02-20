@@ -20,6 +20,10 @@
 "clearBadge"="Clear Badge";
 "ssh"="OpenSSH";
 "wallproxy"="WallProxy";
+"torch"="Torch";
+"clock"="Clock";
+"calculator"="Calculator";
+"camera"="Camera";
 
 "Enabled"="INCLUDE";
 "Disabled"="DO NOT INCLUDE";

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>torch</key>
+	<integer>0</integer>
+	<key>clock</key>
+	<integer>1</integer>
+	<key>calculator</key>
+	<integer>2</integer>
+	<key>camera</key>
+	<integer>3</integer>
+	<key>home</key>
+	<integer>4</integer>
+	<key>lock</key>
+	<integer>5</integer>
+	<key>screenShot</key>
+	<integer>6</integer>
+</dict>
+</plist>

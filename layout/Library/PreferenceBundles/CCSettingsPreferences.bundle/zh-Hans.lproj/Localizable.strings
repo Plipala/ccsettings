@@ -21,6 +21,10 @@
 "flux"="f.lux";
 "ssh"="OpenSSH";
 "wallproxy"="WallProxy";
+"torch"="手电筒";
+"clock"="时钟";
+"calculator"="计算器";
+"camera"="相机";
 
 "Enabled"="包括";
 "Disabled"="不包括";
