@@ -821,18 +821,8 @@ NSString * (*SBSCopyLocalizedApplicationNameForDisplayIdentifier)(NSString*);
 
 - (void)tableView:(UITableView*)tableView didSelectRowAtIndexPath:(NSIndexPath*)indexPath
 {
-    NSString *identifier = nil;
-
-    if ([[_togglesArray objectAtIndex:indexPath.row] isEqualToString:@"3G4GLTE"])
-    {
-        identifier = [self _RATModeString];
-    }
-    else {
-        identifier = [_togglesArray objectAtIndex:indexPath.row];
-    }
-
+    NSString *identifier = [_togglesArray objectAtIndex:indexPath.row];
     UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-
     if (identifier != nil)
     {
         if ([[_hideWhenLockedDictionary objectForKey:identifier] boolValue])
@@ -892,7 +882,7 @@ NSString * (*SBSCopyLocalizedApplicationNameForDisplayIdentifier)(NSString*);
     {
         UIImage *cellImage = [UIImage imageWithContentsOfFile:[[NSBundle bundleWithIdentifier:@"com.plipala.ccsettingspreferences"] pathForResource:[NSString stringWithFormat:@"%@@2x",identifier] ofType:@"png"]];
         cell.imageView.image = cellImage;
-        if ([[_hideWhenLockedDictionary objectForKey:identifier] boolValue])
+        if ([[_hideWhenLockedDictionary objectForKey:[_togglesArray objectAtIndex:indexPath.row]] boolValue])
         {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
         }

@@ -1937,13 +1937,13 @@ static NSTimer *homeMenuTimer = nil;
 %new
 -(void)_initVibrate{
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), self, &vibrateCallback, CFSTR("com.apple.springboard.silent-vibrate.changed"), NULL, CFNotificationSuspensionBehaviorCoalesce);
-	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), self, &vibrateCallback, CFSTR("com.apple.springboard.ring-vibrate.change"), NULL, CFNotificationSuspensionBehaviorCoalesce);
+	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), self, &vibrateCallback, CFSTR("com.apple.springboard.ring-vibrate.changed"), NULL, CFNotificationSuspensionBehaviorCoalesce);
 }
 
 %new
 -(void)_tearDownVibrate{
 	CFNotificationCenterRemoveObserver(CFNotificationCenterGetDarwinNotifyCenter(), self, CFSTR("com.apple.springboard.silent-vibrate.changed"), NULL);
-	CFNotificationCenterRemoveObserver(CFNotificationCenterGetDarwinNotifyCenter(), self, CFSTR("com.apple.springboard.ring-vibrate.change"), NULL); 
+	CFNotificationCenterRemoveObserver(CFNotificationCenterGetDarwinNotifyCenter(), self, CFSTR("com.apple.springboard.ring-vibrate.changed"), NULL); 
 }
 
 %new
@@ -1975,7 +1975,7 @@ static NSTimer *homeMenuTimer = nil;
             notify_post("com.apple.springboard.silent-vibrate.changed");
         }
         else {
-            notify_post("com.apple.springboard.ring-vibrate.change");
+            notify_post("com.apple.springboard.ring-vibrate.changed");
         }
     }
 
